@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -15,5 +16,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
-    // 
+    // user profile
+    Route::prefix('user')->group(function () {
+        Route::get('/profile', [UserController::class, 'show']);
+        Route::put('/profile', [UserController::class, 'update']);
+        Route::put('/password', [UserController::class, 'changePassword']);
+        Route::post('/photo', [UserController::class, 'uploadPhoto']);
+        Route::delete('/photo', [UserController::class, 'deletePhoto']);
+    });
 });
