@@ -1,0 +1,3 @@
+file ini untuk mencatat
+URL API apa saja yang sudah jadi (/items, /users, dll).
+Credential testing (email/password akun buat login).
