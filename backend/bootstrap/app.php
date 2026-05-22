@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
          $middleware->alias([
             'active' => \App\Http\Middleware\EnsureIsActive::class,
+            'admin'  => \App\Http\Middleware\EnsureIsAdmin::class,
         ]);
 
         // paksa API auth gagal return JSON

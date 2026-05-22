@@ -24,4 +24,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/photo', [UserController::class, 'uploadPhoto']);
         Route::delete('/photo', [UserController::class, 'deletePhoto']);
     });
+
+    // admin — user management
+    Route::middleware([
+        'auth:sanctum',
+        'active',
+        'admin'
+    ])->prefix('admin')->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::put(
+            '/users/{user}/toggle-active',
+            [UserController::class, 'toggleActive']
+        );
+    });
 });

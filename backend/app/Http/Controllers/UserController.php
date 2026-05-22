@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Http\Resources\UserResource;
 use App\Services\FileUploadService;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,125 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * GET /api/admin/users
+     * Ambil daftar semua user.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'search' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'role' => [
+                'nullable',
+                'in:user,admin',
+            ],
+
+            'is_active' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'per_page' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
+        ]);
+
+        $users = User::query()
+
+            ->when(
+                $validated['search'] ?? null,
+                function ($query, $search) {
+
+                    $query->where(function ($query) use ($search) {
+
+                        $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('username', 'like', "%{$search}%");
+                    });
+                }
+            )
+
+            ->when(
+                isset($validated['role']),
+                fn($query) => $query->where('role', $validated['role'])
+            )
+
+            ->when(
+                isset($validated['is_active']),
+                fn($query) => $query->where(
+                    'is_active',
+                    filter_var($validated['is_active'], FILTER_VALIDATE_BOOLEAN)
+                )
+            )
+            ->latest()
+            ->paginate($validated['per_page'] ?? 15);
+
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'data' => [
+                'users' => UserResource::collection($users),
+            ],
+
+            'meta' => [
+                'total' => $users->total(),
+                'per_page' => $users->perPage(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+            ],
+        ], 200);
+    }
+
+    /**
+     * PUT /api/admin/users/{id}/toggle-active
+     * Aktifkan / nonaktifkan akun user.
+     */
+    public function toggleActive(User $user, Request $request): JsonResponse
+    {
+        // admin tidak bisa mengubah status dirinya sendiri
+        if ($user->id === $request->user()->id) {
+
+            return response()->json([
+                'code' => 422,
+                'status' => 'error',
+                'message' => 'Tidak bisa mengubah status akun sendiri.',
+            ], 422);
+        }
+
+        // toggle status
+        $user->update([
+            'is_active' => ! $user->is_active,
+        ]);
+
+        // revoke token jika akun dinonaktifkan
+        if (! $user->is_active) {
+            $user->tokens()->delete();
+        }
+
+        return response()->json([
+            'code' => 200,
+
+            'status' => 'success',
+
+            'message' => $user->is_active
+                ? 'Akun berhasil diaktifkan.'
+                : 'Akun berhasil dinonaktifkan.',
+
+            'data' => [
+                'user' => new UserResource($user->fresh()),
+            ],
+        ], 200);
+    }
+
     public function __construct(
         protected FileUploadService $uploadService
     ) {}
@@ -116,7 +236,6 @@ class UserController extends Controller
                 'status' => 'error',
                 'message' => 'Password saat ini salah.',
             ], 422);
-
         }
 
         // update password
@@ -195,7 +314,6 @@ class UserController extends Controller
                 'status' => 'error',
                 'message' => 'Kamu belum memiliki foto profil.',
             ], 422);
-
         }
 
         // hapus file dari storage
