@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,10 @@ Route::prefix('auth')->group(function () {
 Route::get('/categories',      [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
 
+// item
+Route::get('/items', [ItemController::class, 'index']);
+Route::get('/items/{id}', [ItemController::class, 'show']);
+
 // protected routes, harus login dulu
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -28,6 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/password', [UserController::class, 'changePassword']);
         Route::post('/photo', [UserController::class, 'uploadPhoto']);
         Route::delete('/photo', [UserController::class, 'deletePhoto']);
+        // item yang didonasikan user
+        Route::get('/items', [ItemController::class, 'myItems']);
+        // item management
+        Route::post('/items', [ItemController::class, 'store']);
+        Route::put('/items/{id}', [ItemController::class, 'update']);
+        Route::post('/items/{id}/images', [ItemController::class, 'updateImages']);
+        Route::delete('/items/{id}', [ItemController::class, 'destroy']);
     });
 
     // admin — hanya bisa diakses oleh user dengan role admin
@@ -47,6 +59,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // category management
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
-        Route::delete('/categories/{id}',[CategoryController::class, 'destroy']);
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
     });
 });
