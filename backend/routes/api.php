@@ -25,12 +25,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/photo', [UserController::class, 'deletePhoto']);
     });
 
-    // admin — user management
+    // admin — hanya bisa diakses oleh user dengan role admin
     Route::middleware([
         'auth:sanctum',
         'active',
         'admin'
     ])->prefix('admin')->group(function () {
+
+        // user management
         Route::get('/users', [UserController::class, 'index']);
         Route::put(
             '/users/{user}/toggle-active',
