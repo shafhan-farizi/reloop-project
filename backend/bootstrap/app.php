@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,12 +14,45 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+         $middleware->alias([
+            'active' => \App\Http\Middleware\EnsureIsActive::class,
+            'admin'  => \App\Http\Middleware\EnsureIsAdmin::class,
+        ]);
+
+        // paksa API auth gagal return JSON
+        $middleware->redirectGuestsTo(function (Request $request) {
+
+            if ($request->is('api/*')) {
+                throw new AuthenticationException(
+                    'Unauthenticated.'
+                );
+            }
+
+            return route('login');
+        });
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
-        // handling error untuk API, biar selalu return JSON
+
+        // semua route api return json
         $exceptions->shouldRenderJsonWhen(function (Request $request) {
             return $request->is('api/*');
         });
 
+        // custom response unauthenticated
+        $exceptions->render(function (
+            AuthenticationException $e,
+            Request $request
+        ) {
+
+            if ($request->is('api/*')) {
+
+                return response()->json([
+                    'code' => 401,
+                    'status' => 'error',
+                    'message' => 'Unauthenticated. Silakan login terlebih dahulu.',
+                ], 401);
+            }
+        });
     })->create();
