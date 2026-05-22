@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,12 +19,13 @@ class CategoryController extends Controller
         $categories = Category::withCount([
             'items' => fn($q) => $q->where('status', 'available'),
         ])
-        ->orderBy('name')
-        ->get();
+            ->orderBy('name')
+            ->get();
 
         return response()->json([
             'code' => 200,
             'status' => 'success',
+            'message' => 'Data kategori berhasil diambil',
 
             'data' => [
                 'categories' => CategoryResource::collection($categories),
@@ -39,22 +39,11 @@ class CategoryController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        try {
+        $category = Category::withCount([
+            'items' => fn($q) => $q->where('status', 'available'),
+        ])->find($id);
 
-            $category = Category::withCount([
-                'items' => fn($q) => $q->where('status', 'available'),
-            ])->findOrFail($id);
-
-            return response()->json([
-                'code' => 200,
-                'status' => 'success',
-
-                'data' => [
-                    'category' => new CategoryResource($category),
-                ],
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
+        if (! $category) {
 
             return response()->json([
                 'code' => 404,
@@ -62,6 +51,16 @@ class CategoryController extends Controller
                 'message' => 'Kategori tidak ditemukan.',
             ], 404);
         }
+
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'message' => 'Detail kategori berhasil diambil',
+
+            'data' => [
+                'category' => new CategoryResource($category),
+            ],
+        ], 200);
     }
 
     /**
@@ -92,7 +91,7 @@ class CategoryController extends Controller
         return response()->json([
             'code' => 201,
             'status' => 'success',
-            'message' => 'Kategori berhasil dibuat.',
+            'message' => 'Kategori berhasil dibuat',
 
             'data' => [
                 'category' => new CategoryResource($category),
@@ -106,39 +105,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        try {
+        $category = Category::find($id);
 
-            $category = Category::findOrFail($id);
-
-            $validated = $request->validate([
-                'name' => [
-                    'sometimes',
-                    'string',
-                    'max:100',
-                    'unique:categories,name,' . $category->id,
-                ],
-
-                'description' => [
-                    'nullable',
-                    'string',
-                ],
-            ], [
-                'name.unique' => 'Nama kategori sudah digunakan.',
-            ]);
-
-            $category->update($validated);
-
-            return response()->json([
-                'code' => 200,
-                'status' => 'success',
-                'message' => 'Kategori berhasil diperbarui.',
-
-                'data' => [
-                    'category' => new CategoryResource($category->fresh()),
-                ],
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
+        if (! $category) {
 
             return response()->json([
                 'code' => 404,
@@ -146,6 +115,34 @@ class CategoryController extends Controller
                 'message' => 'Kategori tidak ditemukan.',
             ], 404);
         }
+
+        $validated = $request->validate([
+            'name' => [
+                'sometimes',
+                'string',
+                'max:100',
+                'unique:categories,name,' . $category->id,
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+        ], [
+            'name.unique' => 'Nama kategori sudah digunakan.',
+        ]);
+
+        $category->update($validated);
+
+        return response()->json([
+            'code' => 200,
+            'status' => 'success',
+            'message' => 'Kategori berhasil diperbarui',
+
+            'data' => [
+                'category' => new CategoryResource($category->fresh()),
+            ],
+        ], 200);
     }
 
     /**
@@ -154,29 +151,29 @@ class CategoryController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        try {
+        $category = Category::find($id);
 
-            $category = Category::findOrFail($id);
-
-            $category->delete();
-
-            return response()->json([
-                'code' => 200,
-                'status' => 'success',
-                'message' => 'Kategori berhasil dihapus.',
-            ], 200);
-
-        } catch (ModelNotFoundException $e) {
+        if (! $category) {
 
             return response()->json([
                 'code' => 404,
                 'status' => 'error',
                 'message' => 'Kategori tidak ditemukan.',
             ], 404);
+        }
+
+        try {
+
+            $category->delete();
+
+            return response()->json([
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Kategori berhasil dihapus',
+            ], 200);
 
         } catch (QueryException $e) {
 
-            // FK constraint
             if ($e->getCode() === '23000') {
 
                 return response()->json([
