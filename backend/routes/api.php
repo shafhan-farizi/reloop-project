@@ -1,0 +1,52 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('auth')->group(function () {
+    Route::post('/register', [AuthController::class, 'register']);
+
+    // maksimal 5 percobaan login per menit untuk mencegah brute-force
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+});
+
+// kategori publik — tidak butuh token
+Route::get('/categories',      [CategoryController::class, 'index']);
+Route::get('/categories/{id}', [CategoryController::class, 'show']);
+
+// protected routes, harus login dulu
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/auth/me', [AuthController::class, 'me']);
+
+    // user profile
+    Route::prefix('user')->group(function () {
+        Route::get('/profile', [UserController::class, 'show']);
+        Route::put('/profile', [UserController::class, 'update']);
+        Route::put('/password', [UserController::class, 'changePassword']);
+        Route::post('/photo', [UserController::class, 'uploadPhoto']);
+        Route::delete('/photo', [UserController::class, 'deletePhoto']);
+    });
+
+    // admin — hanya bisa diakses oleh user dengan role admin
+    Route::middleware([
+        'auth:sanctum',
+        'active',
+        'admin'
+    ])->prefix('admin')->group(function () {
+
+        // user management
+        Route::get('/users', [UserController::class, 'index']);
+        Route::put(
+            '/users/{user}/toggle-active',
+            [UserController::class, 'toggleActive']
+        );
+
+        // category management
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::put('/categories/{id}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{id}',[CategoryController::class, 'destroy']);
+    });
+});
