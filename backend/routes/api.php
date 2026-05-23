@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\RequestController;
+use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,32 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
+    // item yang didonasikan user
+    Route::get('/user/items', [ItemController::class, 'myItems']);
+    // item management
+    Route::post('/items', [ItemController::class, 'store']);
+    Route::put('/items/{id}', [ItemController::class, 'update']);
+    Route::post('/items/{id}/images', [ItemController::class, 'updateImages']);
+    Route::delete('/items/{id}', [ItemController::class, 'destroy']);
+
+    // requests
+    Route::get('/requests/incoming', [RequestController::class, 'incoming']);
+    Route::get('/requests', [RequestController::class, 'index']);
+    Route::post('/requests', [RequestController::class, 'store']);
+    Route::get('/requests/{id}', [RequestController::class, 'show']);
+    Route::put('/requests/{id}/approve', [RequestController::class, 'approve']);
+    Route::put('/requests/{id}/reject', [RequestController::class, 'reject']);
+    Route::put('/requests/{id}/cancel', [RequestController::class, 'cancel']);
+
+    // shipments
+    Route::get('/shipments', [ShipmentController::class, 'index']);
+    Route::get('/shipments/{id}', [ShipmentController::class, 'show']);
+    Route::post('/shipments', [ShipmentController::class, 'store']);
+    Route::put('/shipments/{id}/status', [ShipmentController::class, 'updateStatus']);
+    // feedback
+    Route::post('/shipments/{id}/feedback', [ShipmentController::class, 'submitFeedback']);
+    Route::put('/shipments/{id}/feedback', [ShipmentController::class, 'updateFeedback']);
+
     // user profile
     Route::prefix('user')->group(function () {
         Route::get('/profile', [UserController::class, 'show']);
@@ -33,13 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/password', [UserController::class, 'changePassword']);
         Route::post('/photo', [UserController::class, 'uploadPhoto']);
         Route::delete('/photo', [UserController::class, 'deletePhoto']);
-        // item yang didonasikan user
-        Route::get('/items', [ItemController::class, 'myItems']);
-        // item management
-        Route::post('/items', [ItemController::class, 'store']);
-        Route::put('/items/{id}', [ItemController::class, 'update']);
-        Route::post('/items/{id}/images', [ItemController::class, 'updateImages']);
-        Route::delete('/items/{id}', [ItemController::class, 'destroy']);
     });
 
     // admin — hanya bisa diakses oleh user dengan role admin
