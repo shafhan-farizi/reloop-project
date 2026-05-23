@@ -21,7 +21,7 @@ class ItemController extends Controller
         $request->validate([
             'search'      => ['nullable', 'string', 'max:100'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'condition'   => ['nullable', 'in:baru,seperti baru,layak pakai,perlu perbaikan'],
+            'condition'   => ['nullable', 'in:baru,seperti baru,layak pakai'], 
             'status'      => ['nullable', 'in:available,reserved,donated'],
             'location'    => ['nullable', 'string', 'max:100'],
             'per_page'    => ['nullable', 'integer', 'min:1', 'max:50'],
@@ -50,14 +50,18 @@ class ItemController extends Controller
             ->paginate($request->per_page ?? 12);
 
         return response()->json([
-            'items' => ItemResource::collection($items),
-            'meta'  => [
-                'total'        => $items->total(),
-                'per_page'     => $items->perPage(),
-                'current_page' => $items->currentPage(),
-                'last_page'    => $items->lastPage(),
-            ],
-        ]);
+            'code'   => 200,
+            'status' => 'success',
+            'data'   => [
+                'items' => ItemResource::collection($items),
+                'meta'  => [
+                    'total'        => $items->total(),
+                    'per_page'     => $items->perPage(),
+                    'current_page' => $items->currentPage(),
+                    'last_page'    => $items->lastPage(),
+                ],
+            ]
+        ], 200);
     }
 
     /**
@@ -68,11 +72,19 @@ class ItemController extends Controller
     {
         $item = Item::with(['donor', 'category'])
             ->withCount('requests')
-            ->findOrFail($id);
+            ->find($id);
+
+        if (!$item) {
+            return $this->errorResponse('Item tidak ditemukan.', 404);
+        }
 
         return response()->json([
-            'item' => new ItemResource($item),
-        ]);
+            'code'   => 200,
+            'status' => 'success',
+            'data'   => [
+                'item' => new ItemResource($item),
+            ]
+        ], 200);
     }
 
     /**
@@ -94,14 +106,18 @@ class ItemController extends Controller
             ->paginate($request->per_page ?? 12);
 
         return response()->json([
-            'items' => ItemResource::collection($items),
-            'meta'  => [
-                'total'        => $items->total(),
-                'per_page'     => $items->perPage(),
-                'current_page' => $items->currentPage(),
-                'last_page'    => $items->lastPage(),
-            ],
-        ]);
+            'code'   => 200,
+            'status' => 'success',
+            'data'   => [
+                'items' => ItemResource::collection($items),
+                'meta'  => [
+                    'total'        => $items->total(),
+                    'per_page'     => $items->perPage(),
+                    'current_page' => $items->currentPage(),
+                    'last_page'    => $items->lastPage(),
+                ],
+            ]
+        ], 200);
     }
 
     /**
@@ -120,11 +136,11 @@ class ItemController extends Controller
             'images'        => ['required', 'array', 'min:1', 'max:5'],
             'images.*'      => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
-            'images.required'  => 'Minimal upload 1 foto.',
-            'images.max'       => 'Maksimal 5 foto.',
-            'images.*.image'   => 'Semua file harus berupa gambar.',
-            'images.*.mimes'   => 'Format gambar harus jpg, jpeg, png, atau webp.',
-            'images.*.max'     => 'Ukuran tiap foto maksimal 2MB.',
+            'images.required'    => 'Minimal upload 1 foto.',
+            'images.max'         => 'Maksimal 5 foto.',
+            'images.*.image'     => 'Semua file harus berupa gambar.',
+            'images.*.mimes'     => 'Format gambar harus jpg, jpeg, png, atau webp.',
+            'images.*.max'       => 'Ukuran tiap foto maksimal 2MB.',
             'category_id.exists' => 'Kategori tidak ditemukan.',
         ]);
 
@@ -141,43 +157,46 @@ class ItemController extends Controller
             'shipping_type' => $request->shipping_type,
             'category_id'   => $request->category_id,
             'donor_id'      => $request->user()->id,
-            'images'        => $imagePaths, // model sudah cast array, langsung assign
-            'status'        => 'available', // selalu mulai dari available
+            'images'        => $imagePaths, 
+            'status'        => 'available',
         ]);
 
         return response()->json([
+            'code'    => 201,
+            'status'  => 'success',
             'message' => 'Item berhasil diposting.',
-            'item'    => new ItemResource($item->load(['donor', 'category'])),
+            'data'    => [
+                'item' => new ItemResource($item->load(['donor', 'category'])),
+            ]
         ], 201);
     }
 
     /**
      * PUT /api/items/{id}
      * Update item — hanya pemilik (donor_id).
-     * Tidak bisa update kalau status sudah reserved/donated.
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
 
-        abort_if(
-            $item->donor_id !== $request->user()->id,
-            403,
-            'Kamu bukan pemilik item ini.'
-        );
+        if (!$item) {
+            return $this->errorResponse('Item tidak ditemukan.', 404);
+        }
 
-        abort_if(
-            in_array($item->status, ['reserved', 'donated']),
-            422,
-            'Item tidak bisa diedit karena sudah ada request aktif atau sudah didonasikan.'
-        );
+        if ($item->donor_id !== $request->user()->id) {
+            return $this->errorResponse('Akses ditolak. Kamu bukan pemilik item ini.', 403);
+        }
+
+        if (in_array($item->status, ['reserved', 'donated'])) {
+            return $this->errorResponse('Item tidak bisa diedit karena sudah ada request aktif atau sudah didonasikan.', 422);
+        }
 
         $request->validate([
             'title'         => ['sometimes', 'string', 'max:255'],
             'description'   => ['sometimes', 'string'],
-            'condition'     => ['sometimes', 'in:baru,seperti baru,layak pakai,perlu perbaikan'],
+            'condition'     => ['sometimes', 'in:baru,seperti baru,layak pakai'],
             'location'      => ['sometimes', 'string', 'max:100'],
-            'shipping_type' => ['sometimes', 'in:pickup,delivery,both'],
+            'shipping_type' => ['sometimes', 'in:free,paid'], 
             'category_id'   => ['sometimes', 'integer', 'exists:categories,id'],
         ]);
 
@@ -187,31 +206,34 @@ class ItemController extends Controller
         ]));
 
         return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
             'message' => 'Item berhasil diperbarui.',
-            'item'    => new ItemResource($item->fresh()->load(['donor', 'category'])),
-        ]);
+            'data'    => [
+                'item' => new ItemResource($item->load(['donor', 'category'])),
+            ]
+        ], 200);
     }
 
     /**
      * POST /api/items/{id}/images
      * Ganti semua foto item — hanya pemilik.
-     * Dipisah dari update() karena pakai form-data, bukan JSON.
      */
     public function updateImages(Request $request, string $id): JsonResponse
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
 
-        abort_if(
-            $item->donor_id !== $request->user()->id,
-            403,
-            'Kamu bukan pemilik item ini.'
-        );
+        if (!$item) {
+            return $this->errorResponse('Item tidak ditemukan.', 404);
+        }
 
-        abort_if(
-            in_array($item->status, ['reserved', 'donated']),
-            422,
-            'Foto tidak bisa diubah karena item sudah ada request aktif.'
-        );
+        if ($item->donor_id !== $request->user()->id) {
+            return $this->errorResponse('Akses ditolak. Kamu bukan pemilik item ini.', 403);
+        }
+
+        if (in_array($item->status, ['reserved', 'donated'])) {
+            return $this->errorResponse('Foto tidak bisa diubah karena item sudah ada request aktif.', 422);
+        }
 
         $request->validate([
             'images'   => ['required', 'array', 'min:1', 'max:5'],
@@ -223,7 +245,7 @@ class ItemController extends Controller
 
         // Hapus semua foto lama
         foreach ($item->images ?? [] as $oldPath) {
-            $this->uploadService->delete($oldPath);
+            $this->uploadService->delete($oldPath); 
         }
 
         $imagePaths = $this->uploadService->uploadMany(
@@ -234,50 +256,62 @@ class ItemController extends Controller
         $item->update(['images' => $imagePaths]);
 
         return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
             'message' => 'Foto item berhasil diperbarui.',
-            'images'  => collect($imagePaths)->map(
-                fn($path) => asset('storage/' . $path)
-            )->values(),
-        ]);
+            'data'    => [
+                'images' => collect($imagePaths)->map(fn($path) => asset('storage/' . $path))->values(),
+            ]
+        ], 200);
     }
 
     /**
      * DELETE /api/items/{id}
      * Hapus item — hanya pemilik.
-     * Hanya bisa dihapus kalau status masih available.
-     * FK CASCADE otomatis hapus requests yang terkait.
      */
-    public function destroy(Request $request, string  $id): JsonResponse
+    public function destroy(Request $request, string $id): JsonResponse
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
 
-        abort_if(
-            $item->donor_id !== $request->user()->id,
-            403,
-            'Kamu bukan pemilik item ini.'
-        );
+        if (!$item) {
+            return $this->errorResponse('Item tidak ditemukan.', 404);
+        }
 
-        abort_if(
-            $item->status === 'reserved',
-            422,
-            'Item tidak bisa dihapus karena sedang ada request aktif.'
-        );
+        if ($item->donor_id !== $request->user()->id) {
+            return $this->errorResponse('Akses ditolak. Kamu bukan pemilik item ini.', 403);
+        }
 
-        abort_if(
-            $item->status === 'donated',
-            422,
-            'Item tidak bisa dihapus karena sudah selesai didonasikan.'
-        );
+        if ($item->status === 'reserved') {
+            return $this->errorResponse('Item tidak bisa dihapus karena sedang ada request aktif.', 422);
+        }
+
+        if ($item->status === 'donated') {
+            return $this->errorResponse('Item tidak bisa dihapus karena sudah selesai didonasikan.', 422);
+        }
 
         // Hapus semua foto dari storage sebelum delete record
         foreach ($item->images ?? [] as $path) {
-            $this->uploadService->delete($path);
+            $this->uploadService->delete($path); 
         }
 
-        $item->delete(); // CASCADE hapus requests yang masih pending otomatis
+        $item->delete(); 
 
         return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
             'message' => 'Item berhasil dihapus.',
-        ]);
+        ], 200);
+    }
+
+    /**
+     * Helper internal untuk format error response
+     */
+    private function errorResponse(string $message, int $code): JsonResponse
+    {
+        return response()->json([
+            'code'    => $code,
+            'status'  => 'error',
+            'message' => $message,
+        ], $code);
     }
 }
