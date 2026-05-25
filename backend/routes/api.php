@@ -25,9 +25,6 @@ Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::get('/items', [ItemController::class, 'index']);
 Route::get('/items/{id}', [ItemController::class, 'show']);
 
-// user profile publik
-Route::get('/{username}',   [UserController::class, 'publicProfile']);
-
 // protected routes, harus login dulu
 Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -102,4 +99,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
         Route::post('/notifications/send', [DashboardController::class, 'sendNotification']);
         Route::post('/notifications/broadcast', [DashboardController::class, 'broadcastNotification']);
     });
+
+    // user profile publik
+    Route::get('/{username}',   [UserController::class, 'publicProfile']);
 });
