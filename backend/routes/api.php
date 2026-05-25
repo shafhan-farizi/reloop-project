@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\UserController;
@@ -23,8 +25,11 @@ Route::get('/categories/{id}', [CategoryController::class, 'show']);
 Route::get('/items', [ItemController::class, 'index']);
 Route::get('/items/{id}', [ItemController::class, 'show']);
 
+// user profile publik
+Route::get('/{username}',   [UserController::class, 'publicProfile']);
+
 // protected routes, harus login dulu
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
@@ -50,9 +55,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/shipments/{id}', [ShipmentController::class, 'show']);
     Route::post('/shipments', [ShipmentController::class, 'store']);
     Route::put('/shipments/{id}/status', [ShipmentController::class, 'updateStatus']);
+    Route::post('/shipments/{id}/confirm-received', [ShipmentController::class, 'confirmReceived']);
     // feedback
     Route::post('/shipments/{id}/feedback', [ShipmentController::class, 'submitFeedback']);
     Route::put('/shipments/{id}/feedback', [ShipmentController::class, 'updateFeedback']);
+
+    // notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 
     // user profile
     Route::prefix('user')->group(function () {
@@ -64,11 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // admin — hanya bisa diakses oleh user dengan role admin
-    Route::middleware([
-        'auth:sanctum',
-        'active',
-        'admin'
-    ])->prefix('admin')->group(function () {
+    Route::middleware('admin')->prefix('admin')->group(function () {
 
         // user management
         Route::get('/users', [UserController::class, 'index']);
@@ -81,5 +89,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+        // dashboard
+        Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+        Route::get('/items', [DashboardController::class, 'allItems']);
+        Route::delete('/items/{id}', [DashboardController::class, 'forceDeleteItem']);
+        Route::get('/requests', [DashboardController::class, 'allRequests']);
+        Route::get('/shipments', [DashboardController::class, 'allShipments']);
+
+        // notification
+        Route::get('/notifications', [DashboardController::class, 'adminNotifications']);
+        Route::post('/notifications/send', [DashboardController::class, 'sendNotification']);
+        Route::post('/notifications/broadcast', [DashboardController::class, 'broadcastNotification']);
     });
 });
