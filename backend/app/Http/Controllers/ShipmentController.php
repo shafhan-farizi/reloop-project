@@ -91,8 +91,9 @@ class ShipmentController extends Controller
         $user        = $request->user();
         $isDonor     = $shipment->request?->item?->donor_id === $user->id;
         $isRequester = $shipment->request?->requester_id === $user->id;
+        $isAdmin     = $user->role === 'admin';
 
-        if (!$isDonor && !$isRequester) {
+        if (!$isDonor && !$isRequester && !$isAdmin) {
             return $this->errorResponse('Akses ditolak. Kamu tidak punya akses ke shipment ini.', 403);
         }
 
@@ -265,7 +266,7 @@ class ShipmentController extends Controller
         }
 
         $shipment->update([
-            'status'       => 'delivered', 
+            'status'       => 'delivered',
             'delivered_at' => now()
         ]);
 
