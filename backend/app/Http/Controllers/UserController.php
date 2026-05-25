@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Item;
 use App\Http\Resources\UserResource;
 use App\Services\FileUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Resources\ItemResource;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function __construct(
+        protected FileUploadService $uploadService
+    ) {}
+
     /**
      * GET /api/admin/users
      * Ambil daftar semua user.
@@ -130,9 +136,49 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function __construct(
-        protected FileUploadService $uploadService
-    ) {}
+    /**
+     * GET /api/{username}
+     * Lihat profil publik user — tidak butuh token.
+     * Hanya tampilkan info yang aman: nama, username, bio, foto, dan item aktifnya.
+     */
+    public function publicProfile(string $username): JsonResponse
+    {
+        $user = User::where('username', $username)
+            ->where('is_active', true) 
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'code'    => 404,
+                'status'  => 'error',
+                'message' => 'Pengguna tidak ditemukan.',
+            ], 404);
+        }
+
+        // Item yang boleh dilihat publik — hanya yang available
+        $items = Item::with('category')
+            ->where('donor_id', $user->id)
+            ->where('status', 'available')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'code'   => 200,
+            'status' => 'success',
+            'data'   => [
+                'user' => [
+                    'username'      => $user->username,
+                    'name'          => $user->name,
+                    'bio'           => $user->bio,
+                    'profile_photo' => $user->profile_photo
+                        ? asset('storage/' . $user->profile_photo)
+                        : null,
+                    'member_since'  => $user->created_at?->toDateString(),
+                ],
+                'items' => ItemResource::collection($items),
+            ]
+        ], 200);
+    }
 
     /**
      * GET /api/user/profile
