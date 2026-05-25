@@ -5,11 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RequestResource;
 use App\Models\Item;
 use App\Models\Request as ItemRequest;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RequestController extends Controller
 {
+    // Inject NotificationService melalui constructor
+    public function __construct(protected NotificationService $notifService) {}
+
     /**
      * GET /api/requests
      * Requester lihat semua request yang pernah dia buat.
@@ -156,6 +160,17 @@ class RequestController extends Controller
             'status'           => 'pending',
         ]);
 
+        // trigger: notifikasi ke donatur bahwa ada request masuk
+        if ($itemRequest->item?->donor_id) {
+            $this->notifService->send(
+                userId: $itemRequest->item->donor_id,
+                type: 'new_request',
+                title: 'Ada Request Masuk!',
+                message: $request->user()->name . ' mengajukan request untuk item "' . $itemRequest->item->title . '".',
+                relatedId: $itemRequest->id,
+            );
+        }
+
         return response()->json([
             'code'    => 201,
             'status'  => 'success',
@@ -202,6 +217,17 @@ class RequestController extends Controller
                 'rejection_reason' => 'Request lain untuk item ini telah disetujui oleh donatur.',
             ]);
 
+        // trigger: notifikasi ke requester bahwa request disetujui
+        if ($itemRequest->requester_id) {
+            $this->notifService->send(
+                userId: $itemRequest->requester_id,
+                type: 'request_approved',
+                title: 'Request Kamu Disetujui!',
+                message: 'Donatur menyetujui request kamu untuk item "' . $itemRequest->item->title . '". Tunggu info pengiriman.',
+                relatedId: $itemRequest->id,
+            );
+        }
+
         return response()->json([
             'code'    => 200,
             'status'  => 'success',
@@ -241,6 +267,17 @@ class RequestController extends Controller
             'rejection_reason' => $request->rejection_reason,
         ]);
 
+        // trigger: notifikasi ke requester bahwa request ditolak
+        if ($itemRequest->requester_id) {
+            $this->notifService->send(
+                userId: $itemRequest->requester_id,
+                type: 'request_rejected',
+                title: 'Request Kamu Ditolak',
+                message: 'Maaf, donatur menolak request kamu untuk item "' . $itemRequest->item->title . '". Alasan: ' . $request->rejection_reason,
+                relatedId: $itemRequest->id,
+            );
+        }
+
         return response()->json([
             'code'    => 200,
             'status'  => 'success',
@@ -274,6 +311,15 @@ class RequestController extends Controller
 
         // Kalau cancel setelah approved → kembalikan item ke available
         if ($itemRequest->status === 'approved') {
+            $hasShipment = $itemRequest->shipment()->exists();
+
+            if ($hasShipment) {
+                return $this->errorResponse(
+                    'Request tidak bisa dibatalkan karena donatur sudah memproses pengiriman.',
+                    422
+                );
+            }
+
             $itemRequest->item?->update(['status' => 'available']);
         }
 
@@ -287,17 +333,5 @@ class RequestController extends Controller
                 'request' => new RequestResource($itemRequest->load(['item'])),
             ]
         ], 200);
-    }
-
-    /**
-     * Helper internal untuk format error response
-     */
-    private function errorResponse(string $message, int $code): JsonResponse
-    {
-        return response()->json([
-            'code'    => $code,
-            'status'  => 'error',
-            'message' => $message,
-        ], $code);
     }
 }
