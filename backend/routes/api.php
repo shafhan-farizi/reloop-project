@@ -102,4 +102,4 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 });
 
 // user profile publik
-    Route::get('/{username}',   [UserController::class, 'publicProfile']);
+Route::get('/{username}',   [UserController::class, 'publicProfile']);
