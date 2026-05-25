@@ -37,7 +37,7 @@ class UserController extends Controller
 
             'is_active' => [
                 'nullable',
-                'boolean',
+                'in:0,1,true,false',
             ],
 
             'per_page' => [
