@@ -6,13 +6,18 @@ use App\Http\Resources\ShipmentResource;
 use App\Models\Request as ItemRequest;
 use App\Models\Shipment;
 use App\Services\FileUploadService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ShipmentController extends Controller
 {
-    public function __construct(protected FileUploadService $uploadService) {}
-    
+    // Inject FileUploadService dan NotificationService melalui constructor
+    public function __construct(
+        protected FileUploadService   $uploadService,
+        protected NotificationService $notifService,
+    ) {}
+
     /**
      * GET /api/shipments
      * Lihat semua pengiriman yang melibatkan user yang sedang login
@@ -22,7 +27,7 @@ class ShipmentController extends Controller
     {
         $request->validate([
             'status'   => ['nullable', 'in:preparing,in_transit,delivered'],
-            'as'       => ['nullable', 'in:donor,requester'], 
+            'as'       => ['nullable', 'in:donor,requester'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
@@ -30,21 +35,20 @@ class ShipmentController extends Controller
 
         $shipments = Shipment::with(['request.item.donor', 'request.requester'])
             ->whereHas('request', function ($query) use ($user, $request) {
-                
+
                 // Jika frontend secara spesifik minta data sebagai donatur
                 if ($request->as === 'donor') {
                     $query->whereHas('item', fn($q) => $q->where('donor_id', $user->id));
-                } 
+                }
                 // Jika frontend secara spesifik minta data sebagai penerima
                 elseif ($request->as === 'requester') {
                     $query->where('requester_id', $user->id);
-                } 
+                }
                 // Jika tidak ada filter, gabungkan dua-duanya (Semua riwayat logistik dia)
                 else {
                     $query->where('requester_id', $user->id)
-                          ->orWhereHas('item', fn($q) => $q->where('donor_id', $user->id));
+                        ->orWhereHas('item', fn($q) => $q->where('donor_id', $user->id));
                 }
-                
             })
             ->when($request->status, fn($q, $status) => $q->where('status', $status))
             ->latest()
@@ -87,8 +91,9 @@ class ShipmentController extends Controller
         $user        = $request->user();
         $isDonor     = $shipment->request?->item?->donor_id === $user->id;
         $isRequester = $shipment->request?->requester_id === $user->id;
+        $isAdmin     = $user->role === 'admin';
 
-        if (!$isDonor && !$isRequester) {
+        if (!$isDonor && !$isRequester && !$isAdmin) {
             return $this->errorResponse('Akses ditolak. Kamu tidak punya akses ke shipment ini.', 403);
         }
 
@@ -189,21 +194,101 @@ class ShipmentController extends Controller
             $updateData['shipped_at'] = now();
         }
 
-        if ($nextStatus === 'delivered') {
-            $updateData['delivered_at'] = now();
+        $shipment->update($updateData);
 
-            // Item resmi jadi donated setelah barang diterima
-            $shipment->request?->item?->update(['status' => 'donated']);
+        // trigger: notif saat barang mulai dikirim
+        if ($nextStatus === 'in_transit' && $shipment->request?->requester_id) {
+            $this->notifService->send(
+                userId: $shipment->request->requester_id,
+                type: 'item_shipped',
+                title: 'Barang Sedang Dikirim!',
+                message: 'Barang kamu sedang dalam perjalanan. No. resi: ' . $shipment->tracking_number . ' via ' . $shipment->courier . '.',
+                relatedId: $shipment->id,
+            );
         }
 
-        $shipment->update($updateData);
+        // trigger: notif saat barang sudah delivered
+        if ($nextStatus === 'delivered' && $shipment->request?->requester_id) {
+            $this->notifService->send(
+                userId: $shipment->request->requester_id,
+                type: 'item_delivered',
+                title: 'Barang Telah Tiba!',
+                message: 'Donatur menyatakan barang sudah dikirim. Konfirmasi penerimaan jika barang sudah di tanganmu.',
+                relatedId: $shipment->id,
+            );
+        }
 
         return response()->json([
             'code'    => 200,
             'status'  => 'success',
             'message' => 'Status pengiriman diperbarui menjadi ' . $nextStatus . '.',
             'data'    => [
-                'shipment' => new ShipmentResource($shipment->load('request.item')), // Dihapus fresh() karena sudah ada di memori
+                'shipment' => new ShipmentResource($shipment->load('request.item')),
+            ]
+        ], 200);
+    }
+
+    /**
+     * POST /api/shipments/{id}/confirm-received
+     * Requester konfirmasi barang sudah diterima.
+     * Item resmi jadi 'donated'. Feedback tetap opsional dan terpisah.
+     */
+    public function confirmReceived(Request $request, string $id): JsonResponse
+    {
+        $shipment = Shipment::with('request.item')->find($id);
+
+        if (!$shipment) {
+            return $this->errorResponse('Shipment tidak ditemukan.', 404);
+        }
+
+        // Hanya requester yang boleh konfirmasi
+        if ($shipment->request?->requester_id !== $request->user()->id) {
+            return $this->errorResponse(
+                'Akses ditolak. Kamu bukan penerima barang dari pengiriman ini.',
+                403
+            );
+        }
+
+        // Shipment harus sudah in_transit oleh donatur dulu
+        if ($shipment->status === 'preparing') {
+            return $this->errorResponse(
+                'Konfirmasi belum bisa dilakukan karena barang belum dikirim.',
+                422
+            );
+        }
+
+        // Cegah konfirmasi ganda — pakai delivered_at sebagai penanda
+        if ($shipment->delivered_at !== null) {
+            return $this->errorResponse(
+                'Kamu sudah mengkonfirmasi penerimaan barang ini.',
+                422
+            );
+        }
+
+        $shipment->update([
+            'status'       => 'delivered',
+            'delivered_at' => now()
+        ]);
+
+        // Item resmi donated setelah dikonfirmasi penerima
+        $shipment->request?->item?->update(['status' => 'donated']);
+
+        if ($shipment->request?->item?->donor_id) {
+            $this->notifService->send(
+                userId: $shipment->request->item->donor_id,
+                type: 'item_received',
+                title: 'Barang Sudah Diterima!',
+                message: 'Penerima mengkonfirmasi barang "' . $shipment->request->item->title . '" sudah diterima. Donasi kamu berhasil!',
+                relatedId: $shipment->id,
+            );
+        }
+
+        return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
+            'message' => 'Penerimaan barang berhasil dikonfirmasi. Terima kasih!',
+            'data'    => [
+                'shipment' => new ShipmentResource($shipment->fresh()->load('request.item')),
             ]
         ], 200);
     }
@@ -224,7 +309,6 @@ class ShipmentController extends Controller
             return $this->errorResponse('Shipment tidak ditemukan.', 404);
         }
 
-        // Hanya requester dari request terkait yang boleh submit feedback
         if ($shipment->request?->requester_id !== $request->user()->id) {
             return $this->errorResponse('Akses ditolak. Kamu bukan penerima barang dari pengiriman ini.', 403);
         }
@@ -243,7 +327,7 @@ class ShipmentController extends Controller
             'rating'           => ['required', 'integer', 'min:1', 'max:5'],
             'feedback_message' => ['nullable', 'string'],
             'feedback_images'  => ['nullable', 'array', 'max:5'],
-            'feedback_images.*'=> ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'feedback_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'rating.min'              => 'Rating minimal 1 bintang.',
             'rating.max'              => 'Rating maksimal 5 bintang.',
@@ -308,7 +392,7 @@ class ShipmentController extends Controller
             'rating'           => ['required', 'integer', 'min:1', 'max:5'],
             'feedback_message' => ['nullable', 'string'],
             'feedback_images'  => ['nullable', 'array', 'max:5'],
-            'feedback_images.*'=> ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'feedback_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'rating.min'              => 'Rating minimal 1 bintang.',
             'rating.max'              => 'Rating maksimal 5 bintang.',
@@ -325,7 +409,7 @@ class ShipmentController extends Controller
             foreach ($shipment->feedback_images ?? [] as $oldPath) {
                 $this->uploadService->delete($oldPath);
             }
-            
+
             $feedbackImagePaths = $this->uploadService->uploadMany(
                 $request->file('feedback_images'),
                 'uploads/feedback'
@@ -346,17 +430,5 @@ class ShipmentController extends Controller
                 'shipment' => new ShipmentResource($shipment->load('request')),
             ]
         ], 200);
-    }
-
-    /**
-     * Helper internal untuk format error response
-     */
-    private function errorResponse(string $message, int $code): JsonResponse
-    {
-        return response()->json([
-            'code'    => $code,
-            'status'  => 'error',
-            'message' => $message,
-        ], $code);
     }
 }
