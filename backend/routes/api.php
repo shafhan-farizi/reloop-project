@@ -53,6 +53,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/shipments', [ShipmentController::class, 'store']);
     Route::put('/shipments/{id}/status', [ShipmentController::class, 'updateStatus']);
     Route::post('/shipments/{id}/confirm-received', [ShipmentController::class, 'confirmReceived']);
+
+    // tracking
+    Route::get('/shipments/{receipt}/track', [ShipmentController::class, 'trackByReceipt']);
+
     // feedback
     Route::post('/shipments/{id}/feedback', [ShipmentController::class, 'submitFeedback']);
     Route::put('/shipments/{id}/feedback', [ShipmentController::class, 'updateFeedback']);

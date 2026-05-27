@@ -24,7 +24,7 @@ class ItemResource extends JsonResource
             )->values(),
 
             // relasi — muncul hanya kalau di-load (pakai whenLoaded)
-            'donor'    => new UserResource($this->whenLoaded('donor')),
+            'donor'    => new UserShipmentTrackingResource($this->whenLoaded('donor')),
             'category' => new CategoryResource($this->whenLoaded('category')),
 
             'requests_count' => $this->whenCounted('requests'),

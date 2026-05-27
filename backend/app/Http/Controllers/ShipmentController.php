@@ -3,20 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ShipmentResource;
+use App\Http\Resources\ShipmentTrackingResource;
+use App\Models\Notification;
 use App\Models\Request as ItemRequest;
 use App\Models\Shipment;
 use App\Services\FileUploadService;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ShipmentController extends Controller
 {
+<<<<<<< HEAD
+    public function __construct(protected FileUploadService $uploadService) {}
+=======
     // Inject FileUploadService dan NotificationService melalui constructor
     public function __construct(
         protected FileUploadService   $uploadService,
         protected NotificationService $notifService,
     ) {}
+>>>>>>> chore/faker-id
 
     /**
      * GET /api/shipments
@@ -431,4 +440,41 @@ class ShipmentController extends Controller
             ]
         ], 200);
     }
+<<<<<<< HEAD
+
+    /**
+     * GET /api/shipments/{receipt}/track
+     * Lacak resi murni LOKAL MOCKING
+     */
+    public function trackByReceipt(string $receipt): JsonResponse
+    {
+        $validated = Validator::make(['receipt' => $receipt], [
+            'receipt' => ['required', 'string', 'alpha_num']
+        ])->validate();
+
+        
+        $shipment = Shipment::with(['request.item', 'request.item.donor', 'request.requester'])->where('tracking_number', $validated['receipt'])->first();
+
+        return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
+            'data'    => [
+                'shipment' => new ShipmentTrackingResource($shipment),
+            ]
+        ], 200);
+    }
+
+    /**
+     * Helper internal untuk format error response
+     */
+    private function errorResponse(string $message, int $code): JsonResponse
+    {
+        return response()->json([
+            'code'    => $code,
+            'status'  => 'error',
+            'message' => $message,
+        ], $code);
+    }
+=======
+>>>>>>> chore/faker-id
 }
