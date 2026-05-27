@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ShipmentResource;
+use App\Http\Resources\ShipmentTrackingResource;
+use App\Models\Notification;
 use App\Models\Request as ItemRequest;
 use App\Models\Shipment;
 use App\Services\FileUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ShipmentController extends Controller
 {
     public function __construct(protected FileUploadService $uploadService) {}
-    
+
     /**
      * GET /api/shipments
      * Lihat semua pengiriman yang melibatkan user yang sedang login
@@ -22,7 +27,7 @@ class ShipmentController extends Controller
     {
         $request->validate([
             'status'   => ['nullable', 'in:preparing,in_transit,delivered'],
-            'as'       => ['nullable', 'in:donor,requester'], 
+            'as'       => ['nullable', 'in:donor,requester'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
@@ -30,21 +35,20 @@ class ShipmentController extends Controller
 
         $shipments = Shipment::with(['request.item.donor', 'request.requester'])
             ->whereHas('request', function ($query) use ($user, $request) {
-                
+
                 // Jika frontend secara spesifik minta data sebagai donatur
                 if ($request->as === 'donor') {
                     $query->whereHas('item', fn($q) => $q->where('donor_id', $user->id));
-                } 
+                }
                 // Jika frontend secara spesifik minta data sebagai penerima
                 elseif ($request->as === 'requester') {
                     $query->where('requester_id', $user->id);
-                } 
+                }
                 // Jika tidak ada filter, gabungkan dua-duanya (Semua riwayat logistik dia)
                 else {
                     $query->where('requester_id', $user->id)
-                          ->orWhereHas('item', fn($q) => $q->where('donor_id', $user->id));
+                        ->orWhereHas('item', fn($q) => $q->where('donor_id', $user->id));
                 }
-                
             })
             ->when($request->status, fn($q, $status) => $q->where('status', $status))
             ->latest()
@@ -243,7 +247,7 @@ class ShipmentController extends Controller
             'rating'           => ['required', 'integer', 'min:1', 'max:5'],
             'feedback_message' => ['nullable', 'string'],
             'feedback_images'  => ['nullable', 'array', 'max:5'],
-            'feedback_images.*'=> ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'feedback_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'rating.min'              => 'Rating minimal 1 bintang.',
             'rating.max'              => 'Rating maksimal 5 bintang.',
@@ -308,7 +312,7 @@ class ShipmentController extends Controller
             'rating'           => ['required', 'integer', 'min:1', 'max:5'],
             'feedback_message' => ['nullable', 'string'],
             'feedback_images'  => ['nullable', 'array', 'max:5'],
-            'feedback_images.*'=> ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'feedback_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [
             'rating.min'              => 'Rating minimal 1 bintang.',
             'rating.max'              => 'Rating maksimal 5 bintang.',
@@ -325,7 +329,7 @@ class ShipmentController extends Controller
             foreach ($shipment->feedback_images ?? [] as $oldPath) {
                 $this->uploadService->delete($oldPath);
             }
-            
+
             $feedbackImagePaths = $this->uploadService->uploadMany(
                 $request->file('feedback_images'),
                 'uploads/feedback'
@@ -344,6 +348,28 @@ class ShipmentController extends Controller
             'message' => 'Feedback berhasil diperbarui.',
             'data'    => [
                 'shipment' => new ShipmentResource($shipment->load('request')),
+            ]
+        ], 200);
+    }
+
+    /**
+     * GET /api/shipments/{receipt}/track
+     * Lacak resi murni LOKAL MOCKING
+     */
+    public function trackByReceipt(string $receipt): JsonResponse
+    {
+        $validated = Validator::make(['receipt' => $receipt], [
+            'receipt' => ['required', 'string', 'alpha_num']
+        ])->validate();
+
+        
+        $shipment = Shipment::with(['request.item', 'request.item.donor', 'request.requester'])->where('tracking_number', $validated['receipt'])->first();
+
+        return response()->json([
+            'code'    => 200,
+            'status'  => 'success',
+            'data'    => [
+                'shipment' => new ShipmentTrackingResource($shipment),
             ]
         ], 200);
     }

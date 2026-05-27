@@ -50,6 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/shipments/{id}', [ShipmentController::class, 'show']);
     Route::post('/shipments', [ShipmentController::class, 'store']);
     Route::put('/shipments/{id}/status', [ShipmentController::class, 'updateStatus']);
+
+    // tracking
+    Route::get('/shipments/{receipt}/track', [ShipmentController::class, 'trackByReceipt']);
+
     // feedback
     Route::post('/shipments/{id}/feedback', [ShipmentController::class, 'submitFeedback']);
     Route::put('/shipments/{id}/feedback', [ShipmentController::class, 'updateFeedback']);
