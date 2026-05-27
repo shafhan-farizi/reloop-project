@@ -302,16 +302,4 @@ class ItemController extends Controller
             'message' => 'Item berhasil dihapus.',
         ], 200);
     }
-
-    /**
-     * Helper internal untuk format error response
-     */
-    private function errorResponse(string $message, int $code): JsonResponse
-    {
-        return response()->json([
-            'code'    => $code,
-            'status'  => 'error',
-            'message' => $message,
-        ], $code);
-    }
 }

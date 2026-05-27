@@ -22,7 +22,7 @@ class AuthController extends Controller
             ],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
             'bio' => ['nullable', 'string'],
@@ -30,10 +30,8 @@ class AuthController extends Controller
             'username.unique' => 'Username sudah digunakan.',
             'username.regex' => 'Username hanya boleh huruf kecil, angka, dan underscore.',
             'email.unique' => 'Email sudah terdaftar.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
-
-        // hash password
-        $validated['password'] = Hash::make($validated['password']);
 
         $validated['role'] = 'user';
         $validated['is_active'] = true;
