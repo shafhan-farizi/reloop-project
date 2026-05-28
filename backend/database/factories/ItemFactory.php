@@ -4,17 +4,20 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Category;
+use App\Traits\RandomImageItems;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemFactory extends Factory
 {
+    use RandomImageItems;
+
     public function definition(): array
     {
         // 1. Pilih nama barang secara acak
         $title = fake()->randomElement([
-            'Kaos Polos Uniqlo', 
-            'Laptop Asus Bekas', 
-            'Buku Novel Tere Liye', 
+            'Kaos Polos Uniqlo',
+            'Laptop Asus Bekas',
+            'Buku Novel Tere Liye',
             'Blender Philips'
         ]);
 
@@ -50,8 +53,8 @@ class ItemFactory extends Factory
         }
 
         // 4. Cari ID Kategori di database berdasarkan nama di atas. Jika tidak ada, ambil acak.
-        $categoryId = Category::where('name', 'LIKE', "%{$categorySearch}%")->first()?->id 
-            ?? Category::inRandomOrder()->first()?->id 
+        $categoryId = Category::where('name', 'LIKE', "%{$categorySearch}%")->first()?->id
+            ?? Category::inRandomOrder()->first()?->id
             ?? Category::factory();
 
         return [
@@ -60,8 +63,7 @@ class ItemFactory extends Factory
             'condition'     => $condition,
             'location'      => fake()->randomElement(['Jakarta Pusat', 'Depok', 'Bogor', 'Bandung', 'Surabaya']),
             'images'        => [
-                'uploads/items/dummy1.jpg',
-                'uploads/items/dummy2.jpg'
+                $this->randomizeImage($title, 'items')
             ],
             'shipping_type' => fake()->randomElement(['free', 'paid']),
             'status'        => fake()->randomElement(['available', 'reserved', 'donated']),
