@@ -22,10 +22,11 @@ export default function Login() {
       } else {
         navigate("/");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Login gagal");
-    }
+    } 
+      catch (error) {
+        console.error(error);
+        alert("Login gagal");
+      }
   };
 
   return (
