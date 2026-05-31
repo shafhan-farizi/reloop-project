@@ -63,7 +63,7 @@ class ItemFactory extends Factory
             'condition'     => $condition,
             'location'      => fake()->randomElement(['Jakarta Pusat', 'Depok', 'Bogor', 'Bandung', 'Surabaya']),
             'images'        => [
-                $this->randomizeImage($title, 'items')
+                $this->randomizeImage($title)
             ],
             'shipping_type' => fake()->randomElement(['free', 'paid']),
             'status'        => fake()->randomElement(['available', 'reserved', 'donated']),
