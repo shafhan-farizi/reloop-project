@@ -137,7 +137,7 @@ class UserController extends Controller
     }
 
     /**
-     * GET /api/{username}
+     * GET /api/users/{username}/profile
      * Lihat profil publik user — tidak butuh token.
      * Hanya tampilkan info yang aman: nama, username, bio, foto, dan item aktifnya.
      */

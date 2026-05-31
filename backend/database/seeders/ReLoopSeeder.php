@@ -60,7 +60,7 @@ class ReLoopSeeder extends Seeder
             'password' => Hash::make('password123'),
             'role' => 'admin',
             'is_active' => 1,
-            'profile_photo' => asset('storage/uploads/profiles/default-admin.webp')
+            'profile_photo' => 'uploads/profiles/default-admin.webp'
         ]);
 
         User::create([
@@ -70,7 +70,7 @@ class ReLoopSeeder extends Seeder
             'password' => Hash::make('password123'),
             'role' => 'user',
             'is_active' => 1,
-            'profile_photo' => asset('storage/uploads/profiles/default-budi.webp')
+            'profile_photo' => 'uploads/profiles/default-budi.webp'
         ]);
 
         // 2. Pembuatan Data Otomatis Menggunakan Model Factory

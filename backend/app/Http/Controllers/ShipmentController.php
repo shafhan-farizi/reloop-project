@@ -436,26 +436,4 @@ class ShipmentController extends Controller
             ]
         ], 200);
     }
-
-    /**
-     * GET /api/shipments/{receipt}/track
-     * Lacak resi murni LOKAL MOCKING
-     */
-    public function trackByReceipt(string $receipt): JsonResponse
-    {
-        $validated = Validator::make(['receipt' => $receipt], [
-            'receipt' => ['required', 'string', 'alpha_num']
-        ])->validate();
-
-        
-        $shipment = Shipment::with(['request.item', 'request.item.donor', 'request.requester'])->where('tracking_number', $validated['receipt'])->first();
-
-        return response()->json([
-            'code'    => 200,
-            'status'  => 'success',
-            'data'    => [
-                'shipment' => new ShipmentTrackingResource($shipment),
-            ]
-        ], 200);
-    }
 }
