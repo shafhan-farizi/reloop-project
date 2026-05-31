@@ -42,7 +42,7 @@ class UserFactory extends Factory
             'is_active'         => 1,
             'phone'             => fake()->phoneNumber(),
             'address'           => fake()->address(),
-            'profile_photo'     => asset('storage/users/default-user.webp'),
+            'profile_photo'     => 'uploads/profiles/default-user.webp',
             'bio'               => $bio,
         ];
     }
