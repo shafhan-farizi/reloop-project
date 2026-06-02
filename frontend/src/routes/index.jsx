@@ -13,27 +13,39 @@ import Register from "../pages/auth/Register";
 
 /* dashboard */
 import Dashboard from "../pages/dashboard/Dashboard";
+import Users from "../pages/admin/Users";
+import Categories from "../pages/admin/Categories";
+import Management from "../pages/admin/Management";
+import InputResi from "../pages/admin/InputResi";
+import TrackingStatus from "../pages/admin/TrackingStatus";
 
 export default function AppRoutes() {
   return (
     <Routes>
-
       {/* PUBLIC */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
       </Route>
 
       {/* auth  */}
-        <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Login />} />
 
-        <Route path="/register" element={<Register />} />
-   
+      <Route path="/register" element={<Register />} />
 
       {/* ADMIN */}
       <Route path="/admin" element={<DashboardLayout />}>
         <Route index element={<Dashboard />} />
-      </Route>
 
+        <Route path="users" element={<Users />} />
+
+        <Route path="categories" element={<Categories />} />
+
+        <Route path="management" element={<Management />} />
+
+        <Route path="input-resi" element={<InputResi />} />
+
+        <Route path="tracking" element={<TrackingStatus />} />
+      </Route>
     </Routes>
   );
 }

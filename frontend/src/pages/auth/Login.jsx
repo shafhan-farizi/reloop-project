@@ -13,20 +13,26 @@ export default function Login() {
     e.preventDefault();
     try {
       const result = await login(form);
-      localStorage.setItem("token", result.token);
 
+      // cek status akun
+      if (!result.user.is_active) {
+        alert("Akun Anda telah dinonaktifkan oleh admin.");
+        return;
+      }
+
+      localStorage.setItem("token", result.token);
       localStorage.setItem("user", JSON.stringify(result.user));
+
       // cek role
       if (result.user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/");
       }
-    } 
-      catch (error) {
-        console.error(error);
-        alert("Login gagal");
-      }
+    } catch (error) {
+      console.error(error.response || error);
+      alert("Login gagal");
+    }
   };
 
   return (

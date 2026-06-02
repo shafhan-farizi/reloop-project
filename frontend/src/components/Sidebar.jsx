@@ -1,11 +1,13 @@
+import { NavLink } from "react-router-dom";
+
 export default function Sidebar({ open, onClose }) {
   const navItems = [
-    { label: 'Dashboard', icon: 'D' },
-    { label: 'Users', icon: 'U' },
-    { label: 'Products', icon: 'P' },
-    { label: 'Orders', icon: 'O' },
-    { label: 'Reports', icon: 'R' },
-    { label: 'Settings', icon: 'S' },
+    { label: 'Dashboard', icon: 'D', to: '/admin' },
+    { label: 'Users', icon: 'U', to: '/admin/users' },
+    { label: 'Categories', icon: 'C', to: '/admin/categories' },
+    { label: 'Input Resi', icon: 'I', to: '/admin/input-resi' },
+    { label: 'Tracking', icon: 'T', to: '/admin/tracking' },
+    { label: 'Management', icon: 'M', to: '/admin/management' },
   ]
 
   return (
@@ -35,21 +37,24 @@ export default function Sidebar({ open, onClose }) {
           <div className="mb-4 text-2xl font-semibold text-slate-900">ReLoop Admin</div>
           <p className="text-sm text-slate-500">Dashboard utama untuk manajemen.</p>
         </div>
-
+        {/* sidebar  */}
         <nav className="space-y-2">
           {navItems.map((item) => (
-            <a
+            <NavLink
               key={item.label}
-              href="#"
-              className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 ${
-                item.label === 'Dashboard' ? 'bg-slate-100 text-slate-900 shadow-sm' : ''
-              }`}
+              to={item.to}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-2xl px-4 py-3 transition-all ${
+                  isActive ? 'bg-slate-100 text-slate-900 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                }`
+              }
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
                 {item.icon}
               </span>
               <span>{item.label}</span>
-            </a>
+            </NavLink>
           ))}
         </nav>
 
