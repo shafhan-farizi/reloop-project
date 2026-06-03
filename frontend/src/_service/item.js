@@ -10,8 +10,16 @@ export const createAdminItem = async (data) => {
   return response.data;
 };
 
+//pengubahan yang tadi 
 export const updateAdminItem = async (id, data) => {
-  const response = await api.put(`/items/${id}`, data);
+  data.append("_method", "PUT");
+
+  const response = await api.post(`/items/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return response.data;
 };
 

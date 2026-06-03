@@ -11,7 +11,8 @@ function getItemImage(images) {
   let url = null;
 
   if (Array.isArray(images)) url = images[0] || null;
-  else if (typeof images === "string" && images.startsWith("http")) url = images;
+  else if (typeof images === "string" && images.startsWith("http"))
+    url = images;
 
   if (!url) return null;
 
@@ -137,7 +138,6 @@ export default function TrackingStatus() {
                 ["Kondisi Barang", shipmentData.request?.item?.condition],
                 ["Lokasi Barang", shipmentData.request?.item?.location],
                 ["Kurir", shipmentData.courier],
-                ["Tracking Number", shipmentData.tracking_number],
                 ["Alamat Tujuan", shipmentData.request?.delivery_address],
                 ["No. Penerima", shipmentData.request?.recipient_phone],
               ].map(([label, value]) => (

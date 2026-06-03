@@ -10,7 +10,6 @@ export default function InputResi() {
   const [form, setForm] = useState({
     request_id: "",
     courier: "",
-    tracking_number: "",
     cod_amount: "",
   });
 
@@ -64,10 +63,8 @@ export default function InputResi() {
       return;
     }
 
-    if (!form.tracking_number) {
-      alert("Nomor resi wajib diisi");
-      return;
-    }
+    // Nomor resi tidak diisi di form ini. Jika ingin, dapat ditambahkan
+    // nanti dari halaman detail shipment.
 
     try {
       setSubmitLoading(true);
@@ -75,9 +72,11 @@ export default function InputResi() {
       const payload = {
         request_id: Number(form.request_id),
         courier: form.courier,
-        tracking_number: form.tracking_number,
         cod_amount: Number(form.cod_amount) || 0,
       };
+
+      // Jika ada tracking_number (mis. di masa depan), sertakan saja
+      if (form.tracking_number) payload.tracking_number = form.tracking_number;
 
       console.log("SHIPMENT PAYLOAD:", payload);
 
@@ -90,7 +89,6 @@ export default function InputResi() {
       setForm({
         request_id: "",
         courier: "",
-        tracking_number: "",
         cod_amount: "",
       });
 
@@ -157,25 +155,6 @@ export default function InputResi() {
                   <option value="AnterAja">AnterAja</option>
                   <option value="Pos Indonesia">Pos Indonesia</option>
                 </select>
-              </div>
-
-              <div>
-                <label className="block mb-2 text-sm font-medium">
-                  Nomor Resi
-                </label>
-
-                <input
-                  type="text"
-                  value={form.tracking_number}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      tracking_number: e.target.value,
-                    }))
-                  }
-                  placeholder="Masukkan nomor resi"
-                  className="w-full px-4 py-3 border rounded-xl"
-                />
               </div>
 
               <div>
