@@ -19,6 +19,7 @@ import Management from "../pages/admin/Management";
 import InputResi from "../pages/admin/InputResi";
 import TrackingStatus from "../pages/admin/TrackingStatus";
 import Notification from "../pages/admin/Notification";
+import DonationHistory from "../pages/admin/HistoryDonation";
 
 export default function AppRoutes() {
   return (
@@ -46,6 +47,8 @@ export default function AppRoutes() {
         <Route path="input-resi" element={<InputResi />} />
 
         <Route path="tracking" element={<TrackingStatus />} />
+
+        <Route path="riwayat" element={<DonationHistory />} />
 
         <Route path="notifications" element={<Notification />} />
       </Route>

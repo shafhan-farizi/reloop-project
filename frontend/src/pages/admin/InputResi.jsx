@@ -105,8 +105,8 @@ export default function InputResi() {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800">
-          Input Resi Pengiriman
+        <h1 className="text-4xl font-bold text-orange-400">
+          Input Pengiriman
         </h1>
 
         <p className="mt-2 text-slate-500">
@@ -180,9 +180,9 @@ export default function InputResi() {
                 <button
                   type="submit"
                   disabled={submitLoading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50"
+                  className="px-6 py-3 bg-[#14B8A6] text-white rounded-xl hover:bg-[#14B8A6]/90 disabled:opacity-50"
                 >
-                  {submitLoading ? "Menyimpan..." : "Simpan Resi"}
+                  {submitLoading ? "Menyimpan..." : "Simpan Shipment"}
                 </button>
               </div>
             </form>
@@ -238,7 +238,7 @@ export default function InputResi() {
                             request_id: req.id,
                           }))
                         }
-                        className="mt-3 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="mt-3 w-full py-2 bg-[#14B8A6] text-white rounded-lg hover:bg-[#14B8A6]/90"
                       >
                         Pilih Request
                       </button>

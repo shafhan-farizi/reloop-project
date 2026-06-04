@@ -30,24 +30,24 @@ export default function Topbar({ onMenuClick }) {
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-slate-100 text-slate-700 transition hover:bg-slate-200 lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-[#14B8A6] text-white transition hover:bg-[#0f9c8f] lg:hidden"
           >
             <span className="text-lg font-semibold">☰</span>
           </button>
           <div>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+            <h1 className="mt-2 text-3xl font-semibold text-[#0f172a]">
               ReLoop Donation Platform
             </h1>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-            <div className="text-sm text-slate-600">Tanggal:</div>
+          <div className="rounded-3xl border border-[#14B8A6] bg-[#ecfdf5] px-4 py-3 shadow-sm">
+            <div className="text-sm text-[#0f766e]">Tanggal:</div>
             <div className="ml-0 font-medium text-slate-900">
               {formattedDate}
             </div>
-            <div className="mt-1 text-sm text-slate-600">Waktu:</div>
+            <div className="mt-1 text-sm text-[#0f766e]">Waktu:</div>
             <div className="ml-0 font-medium text-slate-900">
               {formattedTime}
             </div>
