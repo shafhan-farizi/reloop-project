@@ -1,54 +1,30 @@
+import { Link } from "react-router-dom";
+
 export default function Footer() {
   return (
-    <>
-      <footer className="border-t-2 p-4 bg-white md:p-8 lg:p-10 dark:bg-gray-800">
-        <div className="mx-auto max-w-screen-xl text-center">
-          <ul className="flex flex-wrap justify-center items-center mb-6 text-gray-900 dark:text-white">
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6 ">
-                About
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                Premium
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6 ">
-                Campaigns
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                Blog
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                Affiliate Program
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                FAQs
-              </a>
-            </li>
-            <li>
-              <a href="#" className="mr-4 hover:underline md:mr-6">
-                Contact
-              </a>
-            </li>
-          </ul>
-          <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-            ©{" "}
-            <a href="#" className="hover:underline">
-              2025
-            </a>
-            . All Rights Reserved.
-          </span>
+    <footer className="border-t border-slate-200 bg-slate-50 py-12">
+      <div className="mx-auto grid max-w-screen-2xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.3fr_0.7fr] lg:px-8">
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold text-slate-900">Reloop</h2>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Platform donasi yang menghubungkan barang layak pakai dengan keluarga dan organisasi yang membutuhkan.
+          </p>
         </div>
-      </footer>
-    </>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
+            Beranda
+          </Link>
+          <Link to="/register" className="text-sm text-slate-600 hover:text-slate-900">
+            Daftar
+          </Link>
+          <Link to="/login" className="text-sm text-slate-600 hover:text-slate-900">
+            Masuk
+          </Link>
+        </div>
+      </div>
+      <div className="mt-10 border-t border-slate-200 pt-6 text-center text-sm text-slate-500">
+        Copyright 2026 Reloop. Semua hak cipta dilindungi.
+      </div>
+    </footer>
   );
 }

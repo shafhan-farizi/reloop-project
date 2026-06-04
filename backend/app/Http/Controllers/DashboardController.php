@@ -12,8 +12,8 @@ use App\Models\User;
 use App\Services\FileUploadService;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
-use App\Models\Notification; 
-use Illuminate\Support\Carbon; 
+use App\Models\Notification;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller

@@ -11,7 +11,7 @@ export default function DashboardLayout() {
 
       <main className="flex-1 p-6">
 
-        <Topbar />
+        <Topbar  />
 
         <Outlet />
 
