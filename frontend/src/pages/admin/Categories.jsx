@@ -21,7 +21,7 @@ export default function Categories() {
   const fetchCategories = async () => {
     try {
       const res = await getCategories();
-      setCategories(res.data.categories || []);
+      setCategories(res.categories || []);
     } catch (error) {
       console.log(error);
     }
