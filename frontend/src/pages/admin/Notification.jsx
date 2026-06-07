@@ -1,27 +1,25 @@
 import { useEffect, useState } from "react";
 import {
   FiSearch,
-  FiTrash2,
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
 import {
   getNotif,
-  deleteNotif,
   sendNotif,
   broadcastNotif,
 } from "../../_service/notif";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Semua Status" },
-  { value: "read", label: "Terkirim" },
-  { value: "unread", label: "Terjadwal" },
+  { value: "read", label: "Dibaca" },
+  { value: "unread", label: "Belum Dibaca" },
 ];
 
 const mapStatusLabel = (isRead) => {
   if (isRead)
-    return { label: "Terkirim", className: "bg-emerald-100 text-emerald-700" };
-  return { label: "Terjadwal", className: "bg-amber-100 text-amber-800" };
+    return { label: "Dibaca", className: "bg-emerald-100 text-emerald-700" };
+  return { label: "Belum Dibaca", className: "bg-amber-100 text-amber-800" };
 };
 
 export default function Notification() {
@@ -137,18 +135,6 @@ export default function Notification() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Hapus notifikasi ini?")) return;
-
-    try {
-      await deleteNotif(id);
-      setNotifications((prev) => prev.filter((item) => item.id !== id));
-      setMeta((prev) => ({ ...prev, total: Math.max(prev.total - 1, 0) }));
-    } catch (err) {
-      alert(err?.response?.data?.message || "Gagal menghapus notifikasi.");
-    }
-  };
-
   const renderRecipient = (user) => {
     if (!user) return "Semua User";
     return user.name || user.email || `User #${user.id}`;
@@ -156,7 +142,7 @@ export default function Notification() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl bg-white p-6 shadow-sm">
+      <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Notifikasi</h1>
@@ -173,13 +159,13 @@ export default function Notification() {
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 placeholder="Search"
-                className="w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-700 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100 md:w-80"
+                className="w-full rounded-full border border-[#d1fae5] bg-[#f0fdf4] py-3 pl-11 pr-4 text-sm text-[#0f172a] shadow-sm focus:border-[#14B8A6] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/20 md:w-80"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-full border border-slate-200 bg-white py-3 px-4 text-sm text-slate-700 shadow-sm focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100"
+              className="rounded-full border border-slate-200 bg-white py-3 px-4 text-sm text-slate-700 shadow-sm focus:border-[#14B8A6] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/20"
             >
               {STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -189,7 +175,7 @@ export default function Notification() {
             </select>
             <button
               onClick={handleReset}
-              className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+              className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-[#0f172a] shadow-sm hover:bg-[#ecfdf5]"
             >
               Reset
             </button>
@@ -211,7 +197,7 @@ export default function Notification() {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full bg-[#FB923C] px-4 py-3 text-sm font-semibold text-white hover:bg-[#ea7d1f] disabled:opacity-50"
           >
             {sending ? "Mengirim..." : "Kirim Notifikasi"}
           </button>
@@ -250,7 +236,7 @@ export default function Notification() {
               <select
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100"
+                className="w-full rounded-2xl border border-[#d1fae5] bg-white px-4 py-3 text-sm text-[#0f172a] focus:border-[#FB923C] focus:outline-none focus:ring-2 focus:ring-[#FB923C]/20"
               >
                 <option value="all">Semua User</option>
                 <option value="donor">Semua Donatur</option>
@@ -302,7 +288,7 @@ export default function Notification() {
           </div>
           <button
             onClick={() => loadNotifications(meta.current_page)}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+            className="inline-flex items-center gap-2 rounded-full bg-[#14B8A6] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0f766e]"
           >
             Refresh
           </button>
@@ -324,10 +310,9 @@ export default function Notification() {
                 <th className="px-4 py-4 font-semibold">Jenis</th>
                 <th className="px-4 py-4 font-semibold">Status</th>
                 <th className="px-4 py-4 font-semibold">Tanggal Kirim</th>
-                <th className="px-4 py-4 font-semibold">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[#d1fae5]">
               {loading ? (
                 <tr>
                   <td
@@ -350,17 +335,17 @@ export default function Notification() {
                 notifications.map((notification) => {
                   const status = mapStatusLabel(notification.is_read);
                   return (
-                    <tr key={notification.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-4 text-slate-700">
+                    <tr key={notification.id} className="hover:bg-[#ecfdf5]">
+                      <td className="px-4 py-4 text-[#0f172a]">
                         {notification.id}
                       </td>
-                      <td className="px-4 py-4 text-slate-700">
+                      <td className="px-4 py-4 text-[#0f172a]">
                         {notification.title}
                       </td>
-                      <td className="px-4 py-4 text-slate-700">
+                      <td className="px-4 py-4 text-[#0f172a]">
                         {renderRecipient(notification.user)}
                       </td>
-                      <td className="px-4 py-4 text-slate-700">
+                      <td className="px-4 py-4 text-[#0f172a]">
                         {notification.type || "In-App"}
                       </td>
                       <td className="px-4 py-4">
@@ -370,7 +355,7 @@ export default function Notification() {
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-slate-500">
+                      <td className="px-4 py-4 text-[#475569]">
                         {notification.created_at
                           ? new Date(
                               notification.created_at,
@@ -383,13 +368,6 @@ export default function Notification() {
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleDelete(notification.id)}
-                            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-red-500 text-white hover:bg-red-600"
-                            title="Hapus"
-                          >
-                            <FiTrash2 />
-                          </button>
                         </div>
                       </td>
                     </tr>

@@ -36,23 +36,15 @@ export default function MainContent() {
 
   return (
     <section className="space-y-6">
-      {/* HEADER */}
-      <div>
-        <h1 className="text-4xl font-bold text-orange-500">Dashboard</h1>
-
-        <p className="mt-2 text-slate-500">Selamat Datang, {user?.name}</p>
-      </div>
-
-      {/* HERO */}
-      <div className="relative overflow-hidden rounded-3xl bg-orange-500 p-8 shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-[#14B8A6] p-8 shadow-xl">
         {" "}
         {/* Background Decoration */}
         <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10"></div>
         <div className="absolute right-20 bottom-0 h-32 w-32 rounded-full bg-white/10"></div>
         <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          {/* LEFT */}
+
           <div>
-            <p className="text-sm font-semibold uppercase tracking-widest text-orange-100">
+            <p className="text-sm font-semibold uppercase tracking-widest text-[#FACC15]">
               Admin Dashboard
             </p>
 
@@ -60,7 +52,7 @@ export default function MainContent() {
               Halo, {user?.name} 👋
             </h2>
 
-            <p className="mt-3 max-w-xl text-orange-50">
+            <p className="mt-3 max-w-xl text-white/80">
               Kelola pengguna, donasi, permintaan barang, dan pengiriman dalam
               satu dashboard terpusat.
             </p>
@@ -80,34 +72,34 @@ export default function MainContent() {
             </div>
           </div>
 
-          {/* RIGHT */}
+
           <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-2xl bg-white/15 p-5 backdrop-blur-sm">
-              <p className="text-sm text-orange-100">Total User</p>
+            <div className="rounded-2xl bg-white/15 border border-white/20 p-5 backdrop-blur-sm">
+              <p className="text-sm text-[#FACC15]">Total User</p>
 
               <h3 className="mt-2 text-4xl font-bold text-white">
                 {stats.users.total}
               </h3>
             </div>
 
-            <div className="rounded-2xl bg-white/15 p-5 backdrop-blur-sm">
-              <p className="text-sm text-orange-100">Total Barang</p>
+            <div className="rounded-2xl bg-white/15 border border-white/20 p-5 backdrop-blur-sm">
+              <p className="text-sm text-[#FACC15]">Total Barang</p>
 
               <h3 className="mt-2 text-4xl font-bold text-white">
                 {stats.items.total}
               </h3>
             </div>
 
-            <div className="rounded-2xl bg-white/15 p-5 backdrop-blur-sm">
-              <p className="text-sm text-orange-100">Total Request</p>
+            <div className="rounded-2xl bg-white/15 border border-white/20 p-5 backdrop-blur-sm">
+              <p className="text-sm text-[#FACC15]">Total Request</p>
 
               <h3 className="mt-2 text-4xl font-bold text-white">
                 {stats.requests.total}
               </h3>
             </div>
 
-            <div className="rounded-2xl bg-white/15 p-5 backdrop-blur-sm">
-              <p className="text-sm text-orange-100">Total Shipment</p>
+            <div className="rounded-2xl bg-white/15 border border-white/20 p-5 backdrop-blur-sm">
+              <p className="text-sm text-[#FACC15]">Total Shipment</p>
 
               <h3 className="mt-2 text-4xl font-bold text-white">
                 {stats.shipments.total}
@@ -117,46 +109,44 @@ export default function MainContent() {
         </div>
       </div>
 
-      {/* KPI */}
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <DashboardCard
           title="Total User"
           value={stats.users.total}
           growth={`${stats.users.active} aktif`}
-          icon={<FaUsers className="text-violet-600" />}
-          iconBg="bg-violet-100"
+          icon={<FaUsers className="text-[#84CC16]" />}
+          iconBg="bg-[#dcf7bd]"
         />
 
         <DashboardCard
           title="Total Barang"
           value={stats.items.total}
           growth={`${stats.items.available} tersedia`}
-          icon={<FaBoxOpen className="text-emerald-600" />}
-          iconBg="bg-emerald-100"
+          icon={<FaBoxOpen className="text-[#22C55E]" />}
+          iconBg="bg-[#d9f9dd]"
         />
 
         <DashboardCard
           title="Total Request"
           value={stats.requests.total}
           growth={`${stats.requests.pending} pending`}
-          icon={<FaClipboardList className="text-orange-600" />}
-          iconBg="bg-orange-100"
+          icon={<FaClipboardList className="text-[#FB923C]" />}
+          iconBg="bg-[#fee8d0]"
         />
 
         <DashboardCard
           title="Total Shipment"
           value={stats.shipments.total}
           growth={`${stats.shipments.in_transit} transit`}
-          icon={<FaTruck className="text-blue-600" />}
-          iconBg="bg-blue-100"
+          icon={<FaTruck className="text-[#38BDF8]" />}
+          iconBg="bg-[#dbeafe]"
         />
       </div>
 
-      {/* CONTENT */}
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
         {/* RINGKASAN */}
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900">
+        <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-[#0f172a]">
             Ringkasan Platform
           </h2>
 
@@ -186,8 +176,7 @@ export default function MainContent() {
             />
           </div>
         </div>
-
-        {/* QUICK STATS */}
+        
         <div className="rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900">Monitoring Cepat</h2>
 
@@ -227,10 +216,10 @@ function StatBox({ title, value, color }) {
 
 function QuickItem({ label, value }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
-      <span className="text-slate-600">{label}</span>
+    <div className="flex items-center justify-between rounded-2xl bg-[#ecfdf5] p-4">
+      <span className="text-[#475569]">{label}</span>
 
-      <span className="font-bold text-slate-900">{value}</span>
+      <span className="font-bold text-[#0f172a]">{value}</span>
     </div>
   );
 }

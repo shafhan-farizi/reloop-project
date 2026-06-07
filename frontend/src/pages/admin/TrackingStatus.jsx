@@ -87,7 +87,7 @@ export default function TrackingStatus() {
     <div className="p-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        <h1 className="text-4xl font-bold text-orange-400 mb-4">
           Tracking Status
         </h1>
         <div className="flex gap-3">
@@ -102,7 +102,7 @@ export default function TrackingStatus() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg"
+            className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 disabled:opacity-50 text-white px-5 py-2 rounded-lg"
           >
             {loading ? "Mencari..." : "Cari"}
           </button>

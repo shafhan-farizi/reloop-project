@@ -43,7 +43,7 @@ const handleToggle = async (id) => {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Kelola User</h1>
+        <h1 className="text-4xl font-bold text-orange-400">Kelola User</h1>
         <p className="text-gray-500 mt-1">
           Daftar seluruh pengguna yang terdaftar pada sistem.
         </p>

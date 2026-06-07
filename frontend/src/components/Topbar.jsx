@@ -1,30 +1,4 @@
 import { useEffect, useState } from "react";
-
-
-export default function Topbar({ onMenuClick }) {
-  const [dateTime, setDateTime] = useState(new Date());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDateTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formattedDate = dateTime.toLocaleDateString("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const formattedTime = dateTime.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-
-
 import {
   Bars3Icon,
   BellIcon,
@@ -32,6 +6,10 @@ import {
   MagnifyingGlassIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+
+
+
+
 
 function getRoleLabel(role) {
   if (!role) return "Ag Donatur";
@@ -43,7 +21,6 @@ function getRoleLabel(role) {
 
 export default function Topbar({ onMenuClick }) {
   const [user, setUser] = useState({ name: "Yanto", role: "Ag Donatur" });
-
   useEffect(() => {
     const raw = localStorage.getItem("user");
     if (!raw) return;
@@ -59,7 +36,7 @@ export default function Topbar({ onMenuClick }) {
     }
   }, []);
 
->>>>>>> Stashed changes
+
   return (
     <header className="mb-6 rounded-[2rem] bg-teal-500 px-5 py-4 shadow-[0_32px_80px_rgba(15,23,42,0.08)] text-white">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -67,32 +44,18 @@ export default function Topbar({ onMenuClick }) {
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white/15 text-white transition hover:bg-white/25"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-[#14B8A6] text-white transition hover:bg-[#0f9c8f] lg:hidden"
           >
             <Bars3Icon className="h-6 w-6" />
           </button>
 
           <div>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+            <h1 className="mt-2 text-3xl font-semibold text-[#0f172a]">
               ReLoop Donation Platform
             </h1>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-            <div className="text-sm text-slate-600">Tanggal:</div>
-            <div className="ml-0 font-medium text-slate-900">
-              {formattedDate}
-            </div>
-            <div className="mt-1 text-sm text-slate-600">Waktu:</div>
-            <div className="ml-0 font-medium text-slate-900">
-              {formattedTime}
-            </div>
-          </div>
-=======
-          <div className="hidden h-10 w-px bg-white/25 lg:block" />
-        </div>
 
         <div className="relative mx-auto w-full max-w-2xl">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4">
