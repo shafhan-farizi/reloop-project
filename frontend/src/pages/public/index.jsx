@@ -1,11 +1,11 @@
 import Hero from "../../components/hero";
-import Testimonial from "../../components/testimonial";
+import LandingSections from "../../components/LandingSections";
 
-export default function Home(){
-    return(
-        <>
-            <Hero/>
-            <Testimonial/>
-        </>
-    )
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <LandingSections />
+    </>
+  );
 }

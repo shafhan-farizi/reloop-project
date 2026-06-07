@@ -2,7 +2,7 @@ import api from "../api/xios";
 
 export const getCategories = async () => {
   const response = await api.get("/categories");
-  return response.data;
+  return response.data?.data || response.data || {};
 };
 
 export const createCategory = async (data) => {

@@ -53,7 +53,7 @@ export default function Management() {
     const loadCategories = async () => {
       try {
         const res = await getCategories();
-        setCategories(res?.data?.categories || res?.categories || []);
+        setCategories(res?.categories || []);
       } catch (error) {
         console.error("Gagal memuat kategori:", error);
       }

@@ -33,6 +33,7 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
+        $validated['password'] = Hash::make($validated['password']);
         $validated['role'] = 'user';
         $validated['is_active'] = true;
 
@@ -49,18 +50,20 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+            ->orWhere('username', $request->email)
+            ->first();
 
-        // cek email & password
+        // cek email/username & password
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'code' => 401,
                 'status' => 'error',
-                'message' => 'Email atau password salah',
+                'message' => 'Email/username atau password salah',
             ], 401);
         }
 
