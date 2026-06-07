@@ -36,14 +36,13 @@ export default function MainContent() {
 
   return (
     <section className="space-y-6">
-      {/* HERO */}
       <div className="relative overflow-hidden rounded-3xl bg-[#14B8A6] p-8 shadow-xl">
         {" "}
         {/* Background Decoration */}
         <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10"></div>
         <div className="absolute right-20 bottom-0 h-32 w-32 rounded-full bg-white/10"></div>
         <div className="relative z-10 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          {/* LEFT */}
+
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-[#FACC15]">
               Admin Dashboard
@@ -73,7 +72,7 @@ export default function MainContent() {
             </div>
           </div>
 
-          {/* RIGHT */}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl bg-white/15 border border-white/20 p-5 backdrop-blur-sm">
               <p className="text-sm text-[#FACC15]">Total User</p>
@@ -110,7 +109,6 @@ export default function MainContent() {
         </div>
       </div>
 
-      {/* KPI */}
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         <DashboardCard
           title="Total User"
@@ -145,7 +143,6 @@ export default function MainContent() {
         />
       </div>
 
-      {/* CONTENT */}
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
         {/* RINGKASAN */}
         <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
@@ -179,8 +176,7 @@ export default function MainContent() {
             />
           </div>
         </div>
-
-        {/* QUICK STATS */}
+        
         <div className="rounded-3xl bg-white p-6 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900">Monitoring Cepat</h2>
 

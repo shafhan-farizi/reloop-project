@@ -58,10 +58,10 @@ export default function InputResi() {
       return;
     }
 
-    if (!form.courier) {
-      alert("Pilih kurir");
-      return;
-    }
+    // if (!form.courier) {
+    //   alert("Pilih kurir");
+    //   return;
+    // }
 
     // Nomor resi tidak diisi di form ini. Jika ingin, dapat ditambahkan
     // nanti dari halaman detail shipment.
@@ -135,7 +135,7 @@ export default function InputResi() {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block mb-2 text-sm font-medium">Kurir</label>
 
                 <select
@@ -155,7 +155,7 @@ export default function InputResi() {
                   <option value="AnterAja">AnterAja</option>
                   <option value="Pos Indonesia">Pos Indonesia</option>
                 </select>
-              </div>
+              </div> */}
 
               <div>
                 <label className="block mb-2 text-sm font-medium">

@@ -6,7 +6,7 @@ const headers = () => ({
   Authorization: `Bearer ${localStorage.getItem("token")}`,
 });
 
-// ✅ ADMIN - GET LIST
+// Admin - list
 export const getNotif = async (params) => {
   return await axios.get(`${BASE_URL}/admin/notifications`, {
     headers: headers(),
@@ -14,7 +14,7 @@ export const getNotif = async (params) => {
   });
 };
 
-// ✅ ADMIN - SEND
+// Admin - send
 export const sendNotif = async (data) => {
   return await axios.post(
     `${BASE_URL}/admin/notifications/send`,
@@ -28,7 +28,7 @@ export const sendNotif = async (data) => {
   );
 };
 
-// ✅ ADMIN - BROADCAST
+// Admin - broadcast
 export const broadcastNotif = async (data) => {
   return await axios.post(
     `${BASE_URL}/admin/notifications/broadcast`,

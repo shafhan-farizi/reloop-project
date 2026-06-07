@@ -8,7 +8,7 @@ export default function Sidebar({ open, onClose }) {
     { label: "Dashboard", icon: <FiHome />, to: "/admin" },
     { label: "Users", icon: <FiUser />, to: "/admin/users" },
     { label: "Categories", icon: <FiGrid/> , to: "/admin/categories" },
-    { label: "Input Resi", icon: <FiTruck/> , to: "/admin/input-resi" },
+    { label: "Input Pengiriman", icon: <FiTruck/> , to: "/admin/input-resi" },
     { label: "Tracking", icon: <FiMap/>, to: "/admin/tracking" },
     {label: "Riwayat", icon: <FiClock/>, to: "/admin/riwayat" },
     { label: "Management", icon: <FiSettings/>, to: "/admin/management" },
@@ -88,7 +88,7 @@ export default function Sidebar({ open, onClose }) {
           </p>
         </div>
 
-        {/* Profile + Logout */}
+        {/* Profile*/}
         <div className="mt-auto pt-6">
           <div className="flex items-center justify-between border-t border-white/30 pt-5">
             {/* Profile */}
