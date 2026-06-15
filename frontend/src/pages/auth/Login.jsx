@@ -28,7 +28,7 @@ export default function Login() {
       if (result.user.role === "admin") {
         navigate("/admin");
       } else {
-        navigate("/pengguna");
+        navigate("/pilih-peran");
       }
     } catch (error) {
       console.error(error.response || error);

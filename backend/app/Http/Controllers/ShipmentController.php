@@ -55,7 +55,21 @@ class ShipmentController extends Controller
                         ->orWhereHas('item', fn($q) => $q->where('donor_id', $user->id));
                 }
             })
-            ->when($request->status, fn($q, $status) => $q->where('status', $status))
+            ->when($request->status, function ($q, $status) {
+                if ($status === 'delivered') {
+                    $q->where(function ($query) {
+                        $query->where('status', 'delivered')
+                              ->orWhereNotNull('delivered_at');
+                    });
+                } elseif ($status === 'in_transit') {
+                    $q->where(function ($query) {
+                        $query->where('status', 'in_transit')
+                              ->orWhereNotNull('shipped_at');
+                    });
+                } else {
+                    $q->where('status', $status);
+                }
+            })
             ->latest()
             ->paginate($request->per_page ?? 10);
 
@@ -152,7 +166,8 @@ class ShipmentController extends Controller
             'courier'         => $request->courier,
             'tracking_number' => $request->tracking_number,
             'cod_amount'      => $request->cod_amount,
-            'status'          => 'preparing',
+            'status'          => 'in_transit',
+            'shipped_at'      => now(),
         ]);
 
         return response()->json([
@@ -254,12 +269,22 @@ class ShipmentController extends Controller
             );
         }
 
-        // Shipment harus sudah in_transit oleh donatur dulu
-        if ($shipment->status === 'preparing') {
+        // Jika shipment belum dipastikan dikirim, cek apakah donor sudah memasukkan data resi/kurir.
+        $hasTrackingInfo = !empty($shipment->tracking_number) && !empty($shipment->courier);
+
+        if ($shipment->status === 'preparing' && !$hasTrackingInfo) {
             return $this->errorResponse(
                 'Konfirmasi belum bisa dilakukan karena barang belum dikirim.',
                 422
             );
+        }
+
+        if ($shipment->status === 'preparing' && $hasTrackingInfo) {
+            $shipment->update([
+                'status'     => 'in_transit',
+                'shipped_at' => $shipment->shipped_at ?? now(),
+            ]);
+            $shipment->refresh();
         }
 
         // Cegah konfirmasi ganda — pakai delivered_at sebagai penanda

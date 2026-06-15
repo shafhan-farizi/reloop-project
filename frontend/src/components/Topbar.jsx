@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Bars3Icon,
   BellIcon,
   EnvelopeIcon,
   MagnifyingGlassIcon,
   UserCircleIcon,
+  ArrowUturnLeftIcon,
 } from "@heroicons/react/24/outline";
 
 
@@ -20,6 +22,7 @@ function getRoleLabel(role) {
 }
 
 export default function Topbar({ onMenuClick }) {
+  const navigate = useNavigate();
   const [user, setUser] = useState({ name: "Yanto", role: "Ag Donatur" });
   useEffect(() => {
     const raw = localStorage.getItem("user");
@@ -50,12 +53,11 @@ export default function Topbar({ onMenuClick }) {
           </button>
 
           <div>
-            <h1 className="mt-2 text-3xl font-semibold text-[#0f172a]">
+            <h1 className="mt-2 text-3xl font-semibold text-white">
               ReLoop Donation Platform
             </h1>
           </div>
         </div>
-
 
         <div className="relative mx-auto w-full max-w-2xl">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4">
@@ -69,6 +71,13 @@ export default function Topbar({ onMenuClick }) {
         </div>
 
         <div className="flex items-center gap-3 justify-end">
+          <button
+            onClick={() => navigate("/pilih-peran")}
+            className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white/15 text-white transition hover:bg-white/25"
+            title="Ubah Peran"
+          >
+            <ArrowUturnLeftIcon className="h-5 w-5" />
+          </button>
           <button className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white/15 text-white transition hover:bg-white/25">
             <BellIcon className="h-5 w-5" />
           </button>
@@ -82,7 +91,6 @@ export default function Topbar({ onMenuClick }) {
               <p className="text-xs text-teal-100">{user.role}</p>
             </div>
           </div>
-
         </div>
       </div>
     </header>

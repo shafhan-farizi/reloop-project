@@ -24,14 +24,14 @@ export default function Hero() {
                 to="/register"
                 className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-emerald-700 shadow-lg shadow-emerald-900/20 transition hover:bg-slate-100"
               >
-                Donasi Sekarang
+                Mulai Sekarang
               </Link>
-              <Link
-                to="/login"
+              <a
+                href="#fitur"
                 className="inline-flex items-center justify-center rounded-full border border-white/40 bg-white/10 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
               >
-                Masuk
-              </Link>
+                Pelajari Selengkapnya
+              </a>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-3xl bg-white/10 p-5">

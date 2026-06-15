@@ -27,7 +27,11 @@ export const rejectRequest = async (id, reason = "Request ditolak oleh donatur."
 
 export const getUserRequests = async (params = {}) => {
   const response = await api.get('/requests', { params });
-  return response.data.data;
+  const data = response.data?.data || {};
+  return {
+    requests: data.requests || [],
+    meta: data.meta || {},
+  };
 };
 
 export const createRequest = async (data) => {

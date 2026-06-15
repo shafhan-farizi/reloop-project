@@ -58,7 +58,7 @@ class RequestController extends Controller
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
-        $requests = ItemRequest::with(['item', 'requester'])
+        $requests = ItemRequest::with(['item', 'requester', 'shipment'])
             ->whereHas('item', fn($q) => $q->where('donor_id', $request->user()->id))
             ->when($request->status, fn($q, $status) => $q->where('status', $status))
             ->when($request->item_id, fn($q, $itemId) => $q->where('item_id', $itemId))
