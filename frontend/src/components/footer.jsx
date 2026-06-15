@@ -14,11 +14,11 @@ export default function Footer() {
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
             Beranda
           </Link>
+          <a href="/#fitur" className="text-sm text-slate-600 hover:text-slate-900">
+            Tentang
+          </a>
           <Link to="/register" className="text-sm text-slate-600 hover:text-slate-900">
-            Daftar
-          </Link>
-          <Link to="/login" className="text-sm text-slate-600 hover:text-slate-900">
-            Masuk
+            Bergabung
           </Link>
         </div>
       </div>

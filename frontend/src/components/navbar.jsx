@@ -13,12 +13,9 @@ export default function Navbar() {
           <Link to="/" className="text-sm font-medium text-slate-700 hover:text-slate-900">
             Beranda
           </Link>
-          <Link to="/register" className="text-sm font-medium text-slate-700 hover:text-slate-900">
-            Daftar
-          </Link>
-          <Link to="/login" className="text-sm font-medium text-slate-700 hover:text-slate-900">
-            Masuk
-          </Link>
+          <a href="/#fitur" className="text-sm font-medium text-slate-700 hover:text-slate-900">
+            Tentang
+          </a>
         </div>
 
         <div className="flex items-center gap-3">

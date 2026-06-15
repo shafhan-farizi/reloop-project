@@ -41,3 +41,23 @@ export const broadcastNotif = async (data) => {
     }
   );
 };
+
+// User notifications
+export const getUserNotifications = async (params) => {
+  return await axios.get(`${BASE_URL}/notifications`, {
+    headers: headers(),
+    params,
+  });
+};
+
+export const markNotificationAsRead = async (id) => {
+  return await axios.put(`${BASE_URL}/notifications/${id}/read`, null, {
+    headers: headers(),
+  });
+};
+
+export const markAllNotificationsAsRead = async () => {
+  return await axios.put(`${BASE_URL}/notifications/read-all`, null, {
+    headers: headers(),
+  });
+};

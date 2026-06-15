@@ -55,12 +55,6 @@ export default function CariBarang() {
           <h2 className="text-2xl font-bold">Cari Barang</h2>
           <p className="text-slate-600">Pilih barang yang tersedia.</p>
         </div>
-        <input 
-          placeholder="Cari barang..." 
-          value={q} 
-          onChange={(e) => setQ(e.target.value)} 
-          className="px-4 py-2 border rounded-xl" 
-        />
       </div>
 
       {loading ? <div className="text-center py-10">Memuat...</div> : (

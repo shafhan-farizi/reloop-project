@@ -62,29 +62,38 @@ export default function LandingSections() {
 
   return (
     <main className="space-y-24 px-4 py-16 mx-auto max-w-screen-xl lg:px-8">
-      <section className="grid gap-8 lg:grid-cols-2 lg:items-center">
+      <section id="fitur" className="grid gap-8 lg:grid-cols-2 lg:items-center">
         <div className="space-y-6">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-700">
-            Reloop untuk semua
+            Tentang Reloop
           </p>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Donasi barang tak terpakai, bantu keluarga dalam kebutuhan sehari-hari.
+            Mengubah barang layak pakai menjadi bantuan nyata untuk keluarga dan komunitas.
           </h2>
           <p className="max-w-2xl text-base leading-8 text-slate-600">
-            Reloop memudahkan workflow donasi dan permintaan bantuan. Mulai dari validasi, pengiriman, hingga pendistribusian secara transparan.
+            Reloop adalah platform donasi dan permintaan bantuan yang menghubungkan donatur, penerima, dan relawan dalam satu alur transparan.
+            Kami mempermudah proses pengajuan kebutuhan, penyaluran barang, dan pelaporan agar setiap bantuan sampai ke tujuan dengan aman.
           </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">Misi Kami</h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Memastikan barang bekas berguna mendapat manfaat dan semua orang bisa menerima bantuan tanpa ribet.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">Cara Kerja</h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                Daftar, unggah barang atau kebutuhan, lalu pantau proses validasi dan pengiriman secara real time.
+              </p>
+            </div>
+          </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               to="/register"
               className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
             >
-              Mulai Donasi
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center rounded-full border border-emerald-600 bg-white px-6 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
-            >
-              Ajukan Bantuan
+              Mulai Sekarang
             </Link>
           </div>
         </div>
@@ -138,12 +147,12 @@ export default function LandingSections() {
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-700">Barang tersedia</p>
             <h3 className="text-3xl font-bold tracking-tight sm:text-4xl">Pilihan donasi dan kebutuhan populer.</h3>
           </div>
-          <Link
-            to="/login"
+          <a
+            href="#items"
             className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
           >
             Jelajahi Sekarang
-          </Link>
+          </a>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
@@ -185,13 +194,7 @@ export default function LandingSections() {
               to="/register"
               className="inline-flex items-center justify-center rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
             >
-              Daftar Sekarang
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center rounded-full border border-emerald-700 bg-white px-6 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
-            >
-              Masuk
+              Mulai Sekarang
             </Link>
           </div>
         </div>

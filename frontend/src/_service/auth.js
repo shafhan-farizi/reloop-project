@@ -16,7 +16,7 @@ export const register = async (data) => {
 export const getProfile = async () => {
   const token = localStorage.getItem("token");
 
-  const response = await api.get("/profile", {
+  const response = await api.get("/user/profile", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -27,5 +27,15 @@ export const getProfile = async () => {
 
 export const logout = async () => {
   const response = await api.post("/auth/logout");
+  return response.data;
+};
+
+export const updateProfile = async (data) => {
+  const response = await api.put("/user/profile", data);
+  return response.data;
+};
+
+export const changePassword = async (data) => {
+  const response = await api.put("/user/change-password", data);
   return response.data;
 };

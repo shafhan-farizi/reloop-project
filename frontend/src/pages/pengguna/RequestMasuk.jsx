@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getIncomingRequests, approveRequest, rejectRequest } from "../../_service/request";
 
 const BASE_URL = "http://localhost:8000";
 
 export default function RequestMasuk() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -24,7 +26,7 @@ export default function RequestMasuk() {
     setActionLoading(true);
     try {
       await approveRequest(id);
-      await load();
+      navigate(`/pengguna/pengiriman?request_id=${id}`);
     } catch (error) {
       alert(error.response?.data?.message || "Gagal menyetujui request.");
     } finally {
@@ -48,6 +50,29 @@ export default function RequestMasuk() {
   useEffect(() => {
     load();
   }, []);
+
+  // Fungsi pembantu untuk menentukan URL gambar
+  const getImageUrl = (item) => {
+    const firstImage = Array.isArray(item?.images) ? item.images[0] : null;
+    if (!firstImage) return "/placeholder.png";
+
+    const resolvePath = (path) => {
+      if (typeof path !== 'string') return "/placeholder.png";
+      if (path.startsWith("http://") || path.startsWith("https://")) return path;
+      if (path.startsWith("/")) return `${BASE_URL}${path}`;
+      return `${BASE_URL}/storage/${path}`;
+    };
+
+    if (typeof firstImage === 'string') {
+      return resolvePath(firstImage);
+    }
+
+    if (typeof firstImage === 'object' && firstImage !== null) {
+      return resolvePath(firstImage.url || firstImage.path || firstImage.file_path);
+    }
+
+    return "/placeholder.png";
+  };
 
   return (
     <div className="space-y-8">
@@ -79,10 +104,13 @@ export default function RequestMasuk() {
                     <td className="px-6 py-5 flex items-center gap-4">
                       <div className="h-12 w-12 overflow-hidden rounded-2xl bg-slate-100">
                         <img 
-                          src={r.item?.images?.[0] ? `${BASE_URL}/storage/${r.item.images[0]}` : "/placeholder.png"} 
+                          src={getImageUrl(r.item)}
                           className="h-full w-full object-cover" 
-                          alt="item" 
-                          onError={(e) => { e.target.src = "/placeholder.png"; }}
+                          alt={r.item?.title || "item"}
+                          onError={(e) => { 
+                            e.target.onerror = null; 
+                            e.target.src = "/placeholder.png"; 
+                          }}
                         />
                       </div>
                       <span className="font-semibold text-slate-900">{r.item?.title}</span>

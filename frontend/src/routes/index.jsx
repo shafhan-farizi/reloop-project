@@ -1,11 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 
+/* components */
+import ProtectedRoute from "../components/ProtectedRoute";
+
 /* layouts */
 import PublicLayout from "../layouts/public";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 /* public */
 import Home from "../pages/public";
+import RoleSelectionDashboard from "../pages/RoleSelectionDashboard";
 
 /* auth */
 import Login from "../pages/auth/Login";
@@ -30,7 +34,10 @@ import TambahDonasiDetail from "../pages/pengguna/TambahDonasiDetail";
 import TambahDonasiForm from "../pages/pengguna/TambahDonasiForm";
 import RequestMasuk from "../pages/pengguna/RequestMasuk";
 import Pengiriman from "../pages/pengguna/Pengiriman";
+import Profile from "../pages/pengguna/Profile";
+import Pengaturan from "../pages/pengguna/Pengaturan";
 import RiwayatDonasi from "../pages/pengguna/RiwayatDonasi";
+import NotificationPengguna from "../pages/pengguna/Notification";
 
 /* penerima */
 import PenerimaLayout from "../layouts/PenerimaLayout";
@@ -38,7 +45,11 @@ import Beranda from "../pages/penerima/Beranda";
 import CariBarang from "../pages/penerima/CariBarang";
 import RequestSaya from "../pages/penerima/RequestSaya";
 import TrackingPengiriman from "../pages/penerima/TrackingPengiriman";
+import TrackingDetail from "../pages/penerima/TrackingDetail";
 import RiwayatPenerima from "../pages/penerima/RiwayatPenerima";
+import NotificationPenerima from "../pages/penerima/Notification";
+import ProfilePenerima from "../pages/penerima/Profile";
+import PengaturanPenerima from "../pages/penerima/Pengaturan";
 
 export default function AppRoutes() {
   return (
@@ -48,6 +59,9 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
       </Route>
 
+      {/* ROLE SELECTION - after login */}
+      <Route path="/pilih-peran" element={<ProtectedRoute><RoleSelectionDashboard /></ProtectedRoute>} />
+
       {/* auth  */}
       <Route path="/login" element={<Login />} />
 
@@ -56,7 +70,7 @@ export default function AppRoutes() {
       <Route path="/logout" element={<Logout />} />
 
       {/* ADMIN */}
-      <Route path="/admin" element={<DashboardLayout />}>
+      <Route path="/admin" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
 
         <Route path="users" element={<Users />} />
@@ -75,7 +89,7 @@ export default function AppRoutes() {
       </Route>
 
       {/* PENGGUNA */}
-      <Route path="/pengguna" element={<PenggunaLayout />}>
+      <Route path="/pengguna" element={<ProtectedRoute><PenggunaLayout /></ProtectedRoute>}>
         <Route index element={<PenggunaDashboard />} />
         <Route path="tambah-donasi" element={<TambahDonasi />} />
         <Route path="tambah-donasi/form" element={<TambahDonasiForm />} />
@@ -83,16 +97,23 @@ export default function AppRoutes() {
         <Route path="tambah-donasi/:id/edit" element={<TambahDonasiForm />} />
         <Route path="request-masuk" element={<RequestMasuk />} />
         <Route path="pengiriman" element={<Pengiriman />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="pengaturan" element={<Pengaturan />} />
+        <Route path="notifikasi" element={<NotificationPengguna />} />
         <Route path="riwayat" element={<RiwayatDonasi />} />
       </Route>
 
       {/* PENERIMA */}
-      <Route path="/penerima" element={<PenerimaLayout />}>
+      <Route path="/penerima" element={<ProtectedRoute><PenerimaLayout /></ProtectedRoute>}>
         <Route index element={<Beranda />} />
         <Route path="cari" element={<CariBarang />} />
         <Route path="request-saya" element={<RequestSaya />} />
         <Route path="tracking" element={<TrackingPengiriman />} />
+        <Route path="tracking/:id" element={<TrackingDetail />} />
         <Route path="riwayat" element={<RiwayatPenerima />} />
+        <Route path="notifikasi" element={<NotificationPenerima />} />
+        <Route path="profile" element={<ProfilePenerima />} />
+        <Route path="pengaturan" element={<PengaturanPenerima />} />
       </Route>
     </Routes>
   );
