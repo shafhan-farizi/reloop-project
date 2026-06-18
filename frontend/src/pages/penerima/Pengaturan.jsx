@@ -104,7 +104,7 @@ export default function PengaturanPenerima() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-slate-600">Konfirmasi Password</label>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Konfirmasi Password Baru</label>
                 <input
                   type="password"
                   value={form.password_confirmation}
@@ -117,66 +117,84 @@ export default function PengaturanPenerima() {
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full rounded-2xl bg-teal-600 px-4 py-3 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+                className="rounded-2xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {saving ? "Mengubah..." : "Ubah Password"}
+                {saving ? "Menyimpan..." : "Ubah Password"}
               </button>
             </form>
           </section>
 
           <section className="rounded-3xl bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-semibold text-slate-900">Notifikasi</h2>
-              <p className="text-sm text-slate-500">Kelola preferensi notifikasi Anda.</p>
+              <h2 className="text-xl font-semibold text-slate-900">Preferensi Notifikasi</h2>
+              <p className="text-sm text-slate-500">Pilih notifikasi apa saja yang ingin Anda terima.</p>
             </div>
 
             <div className="mt-6 space-y-4">
-              {["email", "sms", "app"].map((type) => (
-                <label key={type} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={notifications[type]}
-                    onChange={() => toggleNotification(type)}
-                    className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                  />
-                  <span className="text-sm capitalize text-slate-900">
-                    Notifikasi {type === "sms" ? "SMS" : type === "app" ? "Aplikasi" : "Email"}
+              {Object.entries(notifications).map(([key, value]) => (
+                <button
+                  type="button"
+                  key={key}
+                  onClick={() => toggleNotification(key)}
+                  className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left hover:bg-slate-100"
+                >
+                  <div>
+                    <h3 className="font-semibold text-slate-900 capitalize">{key === "app" ? "Aplikasi" : key === "email" ? "Email" : "SMS"}</h3>
+                    <p className="text-sm text-slate-500">{key === "app" ? "Notifikasi di aplikasi." : key === "email" ? "Notifikasi via email." : "Notifikasi via SMS."}</p>
+                  </div>
+                  <span className={`inline-flex h-8 w-16 items-center justify-center rounded-full text-sm font-semibold ${value ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-600"}`}>
+                    {value ? "ON" : "OFF"}
                   </span>
-                </label>
+                </button>
               ))}
             </div>
           </section>
         </div>
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm h-fit">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-semibold text-slate-900">Tampilan</h2>
-            <p className="text-sm text-slate-500">Atur preferensi tema tampilan.</p>
-          </div>
-
-          <div className="mt-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-900">Mode Gelap</span>
-              <button
-                onClick={toggleTheme}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  theme === "dark" ? "bg-teal-600" : "bg-slate-300"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    theme === "dark" ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
-              </button>
+        <div className="space-y-6">
+          <section className="rounded-3xl bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-semibold text-slate-900">Preferensi Tampilan</h2>
+              <p className="text-sm text-slate-500">Atur mode tampilan sesuai kenyamanan Anda.</p>
             </div>
-          </div>
 
-          <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-            <p className="text-xs text-slate-600">
-              <strong>Tema saat ini:</strong> {theme === "dark" ? "Gelap" : "Terang"}
-            </p>
-          </div>
+            <div className="mt-6 space-y-4">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm text-slate-500">Mode Tema</p>
+                    <p className="mt-2 text-lg font-semibold text-slate-900">{theme === "light" ? "Terang" : "Gelap"}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                  >
+                    Ubah ke {theme === "light" ? "Gelap" : "Terang"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm text-slate-500">Reset Setelan</p>
+                <p className="mt-2 text-sm text-slate-700">Perubahan tampilan dan preferensi notifikasi hanya disimpan sementara di browser demo ini.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-3xl bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-semibold text-slate-900">Informasi Tambahan</h2>
+              <p className="text-sm text-slate-500">Halaman ini bisa dikembangkan dengan lebih banyak pengaturan khusus pengguna.</p>
+            </div>
+
+            <ul className="mt-6 space-y-3 text-sm text-slate-600">
+              <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Ubah password dan keamanan akun.</li>
+              <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Kelola preferensi notifikasi.</li>
+              <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Atur tampilan aplikasi.</li>
+              <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Nantinya bisa ditambah fitur hapus akun atau ubah bahasa.</li>
+            </ul>
+          </section>
         </div>
       </div>
     </div>

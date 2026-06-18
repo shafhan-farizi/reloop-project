@@ -36,7 +36,7 @@ export default function SidebarPenerima({ open, onClose }) {
         onClick={onClose}
       />
 
-      <aside className={`fixed inset-y-0 left-0 z-40 w-72 transform flex flex-col bg-teal-700 px-6 py-8 shadow-2xl transition duration-300 lg:static lg:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 lg:w-72 transform flex flex-col bg-teal-700 px-6 py-8 shadow-2xl transition duration-300 lg:fixed lg:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="mb-8 flex items-center justify-between lg:hidden">

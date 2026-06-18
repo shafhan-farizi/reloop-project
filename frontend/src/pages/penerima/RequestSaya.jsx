@@ -87,7 +87,7 @@ export default function RequestSaya() {
             <p className="text-sm text-slate-500">Jumlah Request</p>
             <h3 className="text-2xl font-semibold text-slate-900">{meta?.total ?? requests.length}</h3>
           </div>
-          <div className="grid gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {statusTabs.filter((t) => t.key).map((tab) => (
               <div key={tab.key} className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
                 <p className="text-xs text-slate-500">{tab.label}</p>
@@ -125,6 +125,7 @@ export default function RequestSaya() {
                       <td className="px-6 py-4">
                         <div className="font-semibold text-slate-900">{item.title || r.item_name || "-"}</div>
                         <div className="text-xs text-slate-500">{item.category?.name || item.category_name || "-"}</div>
+                        <div className="text-xs text-slate-500 mt-1">{item.shipping_type === 'free' ? 'Ongkir dibayar oleh pengirim' : item.shipping_type === 'paid' ? 'Ongkir dibayar oleh penerima' : '-'}</div>
                       </td>
                       <td className="px-6 py-4 text-slate-700">{r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-'}</td>
                       <td className="px-6 py-4">

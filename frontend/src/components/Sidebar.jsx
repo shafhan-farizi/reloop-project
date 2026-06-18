@@ -26,7 +26,8 @@ export default function Sidebar({ open, onClose }) {
     { label: "Tracking", icon: <FiMap/>, to: "/admin/tracking" },
     {label: "Riwayat", icon: <FiClock/>, to: "/admin/riwayat" },
     { label: "Management", icon: <FiSettings/>, to: "/admin/management" },
-    { label: "Notifications", icon: <FiBell/>, to: "/admin/notifications" },
+    { label: "Notifications", icon: <FiBell />, to: "/admin/notifications" },
+    { label: "Keluar", icon: <FiLogOut />, to: "/logout" },
   ];
 
   const penerimaItems = [
@@ -74,9 +75,9 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-72 flex flex-col
+        className={`fixed inset-y-0 left-0 z-40 w-64 lg:w-72 flex flex-col
         ${bgColor} px-5 py-6 shadow-2xl transition duration-300
-        lg:static lg:translate-x-0 ${
+        lg:fixed lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >

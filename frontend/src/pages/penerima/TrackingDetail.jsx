@@ -129,6 +129,7 @@ export default function TrackingDetail() {
           <div className="text-sm text-slate-600">
             <div>No. Resi: <b>{shipment.tracking_number || '-'}</b></div>
             <div>Kurir: <b>{shipment.courier || '-'}</b></div>
+            <div>Ongkir: <b>{shipment.request?.item?.shipping_type === 'free' ? 'Ongkir dibayar oleh pengirim' : shipment.request?.item?.shipping_type === 'paid' ? 'Ongkir dibayar oleh penerima' : '-'}</b></div>
             <div>Status: <b>{currentStatus === 'preparing' ? 'Belum dikirim' : currentStatus === 'in_transit' ? 'Dalam perjalanan' : currentStatus === 'delivered' ? 'Sudah diterima' : currentStatus}</b></div>
             {currentStatus === 'delivered' && (
               <div className="mt-2 rounded-full bg-emerald-50 px-3 py-2 text-emerald-700">Tracking selesai. Barang sudah diterima.</div>

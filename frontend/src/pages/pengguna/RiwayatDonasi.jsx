@@ -49,6 +49,27 @@ export default function RiwayatDonasi() {
     load();
   }, []);
 
+  const resolveImageUrl = (value) => {
+    if (!value || typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    const cleaned = trimmed.replace(/^\/+/, '');
+    if (cleaned.startsWith('storage/')) {
+      return `https://bereloop-sibm4.karyakreasi.id/${cleaned}`;
+    }
+    if (cleaned.startsWith('uploads/')) {
+      return `https://bereloop-sibm4.karyakreasi.id/storage/${cleaned}`.replace(/\/storage\/storage/, '/storage');
+    }
+    return `https://bereloop-sibm4.karyakreasi.id/${cleaned}`;
+  };
+
+  const getShipmentImage = (shipment) => {
+    const item = shipment?.request?.item;
+    const rawImage = item?.image_url || item?.images?.[0] || item?.image;
+    return resolveImageUrl(rawImage) || '/placeholder.png';
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold">Riwayat Donasi</h2>
@@ -125,7 +146,7 @@ export default function RiwayatDonasi() {
                   <div className="flex items-center gap-4">
                     <div className="h-16 w-16 rounded-3xl bg-white p-3 shadow-sm">
                       <img
-                        src={selectedShipment.request?.item?.image_url || '/placeholder.png'}
+                        src={getShipmentImage(selectedShipment)}
                         alt={selectedShipment.request?.item?.title || 'Barang'}
                         className="h-full w-full rounded-2xl object-cover"
                       />

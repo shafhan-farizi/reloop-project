@@ -139,6 +139,29 @@ export default function Pengiriman() {
     });
   };
 
+  const resolveImageUrl = (value) => {
+    if (!value) return null;
+    if (typeof value !== "string") return null;
+
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    const cleaned = trimmed.replace(/^\/+/, "");
+    if (cleaned.startsWith("storage/")) {
+      return `https://bereloop-sibm4.karyakreasi.id/${cleaned}`;
+    }
+    if (cleaned.startsWith("uploads/")) {
+      return `https://bereloop-sibm4.karyakreasi.id/storage/${cleaned}`.replace(/\/storage\/storage/, "/storage");
+    }
+    return `https://bereloop-sibm4.karyakreasi.id/${cleaned}`;
+  };
+
+  const getShipmentImage = (shipment) => {
+    const item = shipment?.request?.item;
+    const rawImage = item?.image_url || item?.images?.[0] || item?.image;
+    return resolveImageUrl(rawImage) || "/placeholder.png";
+  };
+
   const getStatusBadge = (status) => {
     const mapping = {
       preparing: "bg-sky-100 text-sky-700",
@@ -284,7 +307,7 @@ export default function Pengiriman() {
               <div className="mt-6 space-y-6">
                 <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                   <div className="flex items-center gap-4">
-                    <img src={selectedShipment.request?.item?.image_url || "/placeholder.png"} alt="Barang" className="h-20 w-20 rounded-3xl object-cover" />
+                    <img src={getShipmentImage(selectedShipment)} alt="Barang" className="h-20 w-20 rounded-3xl object-cover" />
                     <div>
                       <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Penerima</p>
                       <p className="text-lg font-semibold">{selectedShipment.request?.requester?.name || "-"}</p>
