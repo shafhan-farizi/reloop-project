@@ -72,6 +72,16 @@ export default function Profile() {
     loadProfile();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
+          <p className="text-slate-500">Memuat profil...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
@@ -98,155 +108,120 @@ export default function Profile() {
                 <p className="text-sm text-slate-500">Nama Lengkap</p>
                 <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.name || "-"}</p>
               </div>
+
               <div className="rounded-3xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">Username</p>
                 <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.username || "-"}</p>
               </div>
-            </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
               <div className="rounded-3xl border border-slate-200 p-5">
                 <p className="text-sm text-slate-500">Email</p>
                 <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.email || "-"}</p>
               </div>
+
               <div className="rounded-3xl border border-slate-200 p-5">
-                <p className="text-sm text-slate-500">Role</p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.role || "-"}</p>
+                <p className="text-sm text-slate-500">Nomor Telepon</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.phone || "-"}</p>
               </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 p-5">
+              <p className="text-sm text-slate-500">Alamat</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.address || "-"}</p>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 p-5">
+              <p className="text-sm text-slate-500">Bio</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.bio || "-"}</p>
             </div>
           </div>
+
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="mt-6 rounded-2xl bg-teal-600 px-6 py-2 font-medium text-white hover:bg-teal-700"
+            >
+              Edit Profil
+            </button>
+          )}
         </div>
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="h-20 w-20 overflow-hidden rounded-3xl bg-slate-100">
-                  <img
-                    src={profile?.profile_photo || "/placeholder.png"}
-                    alt="Profil"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Akun</p>
-                  <h3 className="text-xl font-semibold text-slate-900">{profile?.name || "-"}</h3>
-                  <p className="text-sm text-slate-500">{profile?.created_at ? new Date(profile.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-"}</p>
-                </div>
+        {isEditing && (
+          <div className="rounded-3xl bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-slate-900">Edit Profil</h2>
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {error && <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+              {message && <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-700">{message}</div>}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Nama Lengkap</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                />
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditing((prev) => !prev);
-                  setMessage("");
-                  setError("");
-                }}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
-              >
-                {isEditing ? "Batal" : "Edit Profil"}
-              </button>
-            </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Username</label>
+                <input
+                  type="text"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                />
+              </div>
 
-            {error ? (
-              <div className="rounded-2xl bg-red-50 p-4 text-sm text-red-700">{error}</div>
-            ) : null}
-            {message ? (
-              <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-700">{message}</div>
-            ) : null}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Nomor Telepon</label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                />
+              </div>
 
-            {isEditing ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Nama Lengkap</label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-                  />
-                </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Alamat</label>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Username</label>
-                  <input
-                    type="text"
-                    value={form.username}
-                    onChange={(e) => setForm((prev) => ({ ...prev, username: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-                  />
-                </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-600">Bio</label>
+                <textarea
+                  value={form.bio}
+                  onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                  rows="3"
+                />
+              </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Email</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    disabled
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Telepon</label>
-                  <input
-                    type="text"
-                    value={form.phone}
-                    onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Alamat</label>
-                  <textarea
-                    rows={3}
-                    value={form.address}
-                    onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-600">Bio singkat</label>
-                  <textarea
-                    rows={3}
-                    value={form.bio}
-                    onChange={(e) => setForm((prev) => ({ ...prev, bio: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-100"
-                  />
-                </div>
-
+              <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={saving}
-                  className="w-full rounded-2xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex-1 rounded-2xl bg-teal-600 px-4 py-2 font-medium text-white hover:bg-teal-700 disabled:opacity-50"
                 >
-                  {saving ? "Menyimpan..." : "Simpan Profil"}
+                  {saving ? "Menyimpan..." : "Simpan"}
                 </button>
-              </form>
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm text-slate-500">Nama Lengkap</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.name || "-"}</p>
-                </div>
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm text-slate-500">Username</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.username || "-"}</p>
-                </div>
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm text-slate-500">Telepon</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.phone || "-"}</p>
-                </div>
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm text-slate-500">Alamat</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{profile?.address || "-"}</p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 rounded-2xl border border-slate-200 px-4 py-2 font-medium text-slate-900 hover:bg-slate-100"
+                >
+                  Batal
+                </button>
               </div>
-            )}
+            </form>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

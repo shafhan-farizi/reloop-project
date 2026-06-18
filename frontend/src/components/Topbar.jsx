@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Bars3Icon,
-  BellIcon,
-  EnvelopeIcon,
   MagnifyingGlassIcon,
   UserCircleIcon,
   ArrowUturnLeftIcon,
@@ -41,21 +39,20 @@ export default function Topbar({ onMenuClick }) {
 
 
   return (
-    <header className="mb-6 rounded-[2rem] bg-teal-500 px-5 py-4 shadow-[0_32px_80px_rgba(15,23,42,0.08)] text-white">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 lg:left-72 z-30 bg-teal-500 px-4 md:px-5 py-3 md:py-4 shadow-[0_32px_80px_rgba(15,23,42,0.08)] text-white rounded-b-[1rem] md:rounded-[2rem]">
+      <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={onMenuClick}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-3xl bg-[#14B8A6] text-white transition hover:bg-[#0f9c8f] lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-3xl bg-[#14B8A6] text-white transition hover:bg-[#0f9c8f] lg:hidden"
           >
             <Bars3Icon className="h-6 w-6" />
           </button>
 
           <div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">
-              ReLoop Donation Platform
-            </h1>
+            <div className="text-lg font-semibold text-white md:hidden">ReLoop</div>
+            <h1 className="hidden md:block mt-0 text-3xl font-semibold text-white">ReLoop Donation Platform</h1>
           </div>
         </div>
 
@@ -66,7 +63,7 @@ export default function Topbar({ onMenuClick }) {
           <input
             type="search"
             placeholder="Cari Sesuatu..."
-            className="w-full rounded-full border border-white/20 bg-white px-14 py-3 text-sm text-slate-900 outline-none transition duration-200 focus:border-white focus:ring-2 focus:ring-white/30"
+            className="w-full rounded-full border border-white/20 bg-white px-12 md:px-14 py-3 text-sm text-slate-900 outline-none transition duration-200 focus:border-white focus:ring-2 focus:ring-white/30"
           />
         </div>
 
@@ -78,12 +75,7 @@ export default function Topbar({ onMenuClick }) {
           >
             <ArrowUturnLeftIcon className="h-5 w-5" />
           </button>
-          <button className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white/15 text-white transition hover:bg-white/25">
-            <BellIcon className="h-5 w-5" />
-          </button>
-          <button className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-white/15 text-white transition hover:bg-white/25">
-            <EnvelopeIcon className="h-5 w-5" />
-          </button>
+          {/* Notification and message icons removed (non-functional) */}
           <div className="inline-flex items-center gap-3 rounded-3xl bg-white/15 px-4 py-2">
             <UserCircleIcon className="h-8 w-8 text-white" />
             <div className="text-left">
