@@ -9,6 +9,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 /* public */
 import Home from "../pages/public";
+import Catalog from "../pages/public/Catalog";
 import RoleSelectionDashboard from "../pages/RoleSelectionDashboard";
 
 /* auth */
@@ -21,7 +22,6 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Users from "../pages/admin/Users";
 import Categories from "../pages/admin/Categories";
 import Management from "../pages/admin/Management";
-import InputResi from "../pages/admin/InputResi";
 import TrackingStatus from "../pages/admin/TrackingStatus";
 import Notification from "../pages/admin/Notification";
 import DonationHistory from "../pages/admin/HistoryDonation";
@@ -57,6 +57,7 @@ export default function AppRoutes() {
       {/* PUBLIC */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/catalog" element={<Catalog />} />
       </Route>
 
       {/* ROLE SELECTION - after login */}
@@ -78,8 +79,6 @@ export default function AppRoutes() {
         <Route path="categories" element={<Categories />} />
 
         <Route path="management" element={<Management />} />
-
-        <Route path="input-resi" element={<InputResi />} />
 
         <Route path="tracking" element={<TrackingStatus />} />
 

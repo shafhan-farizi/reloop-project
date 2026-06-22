@@ -1,14 +1,24 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../api/xios";
 
 const BASE_URL = "http://localhost:8000";
 
 export default function TrackingPengiriman() {
+  const [searchParams] = useSearchParams();
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const searchQuery = searchParams.get("search")?.trim().toLowerCase() || "";
+
+  const filteredShipments = useMemo(() => {
+    if (!searchQuery) return shipments;
+    return shipments.filter((shipment) =>
+      (shipment.request?.item?.title || "").toLowerCase().includes(searchQuery)
+    );
+  }, [shipments, searchQuery]);
 
   const resolveStatus = (s) => {
     if (!s) return s?.status;
@@ -78,13 +88,13 @@ export default function TrackingPengiriman() {
         <div className="rounded-3xl bg-white p-8 text-center shadow-sm">
           <p className="text-slate-500">Memuat data pengiriman...</p>
         </div>
-      ) : shipments.length === 0 ? (
+      ) : filteredShipments.length === 0 ? (
         <div className="rounded-3xl bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-500">Tidak ada pengiriman saat ini.</p>
+          <p className="text-slate-500">Tidak ada pengiriman yang cocok.</p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {shipments.map((shipment) => (
+          {filteredShipments.map((shipment) => (
             <div
               key={shipment.id}
               onClick={() => navigate(`/penerima/tracking/${shipment.id}`)}

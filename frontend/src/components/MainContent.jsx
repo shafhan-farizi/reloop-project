@@ -109,7 +109,7 @@ export default function MainContent() {
         </div>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
           title="Total User"
           value={stats.users.total}
@@ -143,14 +143,14 @@ export default function MainContent() {
         />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
+      <div className="grid gap-6 grid-cols-1 xl:grid-cols-[2fr_1fr]">
         {/* RINGKASAN */}
         <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
           <h2 className="text-xl font-bold text-[#0f172a]">
             Ringkasan Platform
           </h2>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-4 grid-cols-1 md:grid-cols-2">
             <StatBox
               title="User Aktif"
               value={stats.users.active}

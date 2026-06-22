@@ -56,40 +56,41 @@ export default function Beranda() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[2rem] bg-white p-8 shadow-[0_32px_80px_rgba(15,23,42,0.08)]">
+      <div className="max-w-7xl mx-auto">
+      <section className="rounded-[1.25rem] bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-600">Penerima</p>
-            <h1 className="mt-3 text-5xl font-bold uppercase tracking-[-0.03em] text-slate-900">HALO REQUESTER 👋 !!!</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">Terimakasih telah berbagi kebaikan hari ini.</p>
+            <h1 className="mt-3 text-3xl md:text-4xl font-bold text-slate-900">HALO REQUESTER 👋</h1>
+            <p className="mt-3 max-w-2xl text-sm text-slate-600">Terimakasih telah berbagi kebaikan hari ini.</p>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-4">
-          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">Total Requester</p>
-            <p className="mt-4 text-3xl font-bold text-slate-900">{counts.total}</p>
-            <p className="mt-2 text-sm text-slate-500">Request</p>
+        <div className="mt-6 grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 sm:p-6 shadow-sm">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">Total Requester</p>
+            <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-slate-900">{counts.total}</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">Request</p>
           </div>
-          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-emerald-600">Disetujui</p>
-            <p className="mt-4 text-3xl font-bold text-slate-900">{counts.approved}</p>
-            <p className="mt-2 text-sm text-slate-500">Request</p>
+          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 sm:p-6 shadow-sm">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.35em] text-emerald-600">Disetujui</p>
+            <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-slate-900">{counts.approved}</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">Request</p>
           </div>
-          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-rose-600">Ditolak</p>
-            <p className="mt-4 text-3xl font-bold text-slate-900">{counts.rejected}</p>
-            <p className="mt-2 text-sm text-slate-500">Request</p>
+          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 sm:p-6 shadow-sm">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.35em] text-rose-600">Ditolak</p>
+            <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-slate-900">{counts.rejected}</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">Request</p>
           </div>
-          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">Dalam Pengiriman</p>
-            <p className="mt-4 text-3xl font-bold text-slate-900">{counts.pending}</p>
-            <p className="mt-2 text-sm text-slate-500">Request</p>
+          <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 sm:p-6 shadow-sm">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.35em] text-slate-500">Dalam Pengiriman</p>
+            <p className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold text-slate-900">{counts.pending}</p>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-slate-500">Request</p>
           </div>
         </div>
       </section>
 
-      <section className="rounded-[2rem] bg-white p-8 shadow-[0_32px_80px_rgba(15,23,42,0.08)]">
+      <section className="rounded-[1.25rem] bg-white p-6 shadow-sm mt-6">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Rekomendasi Barang</h2>
@@ -105,15 +106,15 @@ export default function Beranda() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {loading ? (
             <div className="col-span-full rounded-[1.75rem] border border-slate-200 bg-slate-50 p-8 text-center text-slate-500">Memuat rekomendasi barang...</div>
           ) : items.length === 0 ? (
             <div className="col-span-full rounded-[1.75rem] border border-slate-200 bg-slate-50 p-8 text-center text-slate-500">Belum ada barang tersedia saat ini.</div>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="rounded-[1.75rem] border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="h-44 overflow-hidden rounded-[1.5rem] bg-slate-100">
+              <div key={item.id} className="rounded-[1rem] border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="h-36 overflow-hidden rounded-lg bg-slate-100">
                   <img
                     src={getImageUrl(item)}
                     alt={item.title || "Barang"}
@@ -134,6 +135,7 @@ export default function Beranda() {
           )}
         </div>
       </section>
+      </div>
     </div>
   );
 }

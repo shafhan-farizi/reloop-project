@@ -23,6 +23,37 @@ class ShipmentController extends Controller
         protected NotificationService $notifService,
     ) {}
 
+    private function normalizeRupiahAmount(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        $clean = preg_replace('/[^\d,.-]/u', '', $raw);
+        if ($clean === '') {
+            return null;
+        }
+
+        $hasDot = str_contains($clean, '.');
+        $hasComma = str_contains($clean, ',');
+
+        if ($hasDot && $hasComma) {
+            $clean = str_replace('.', '', $clean);
+            $clean = str_replace(',', '.', $clean);
+        } elseif ($hasDot && ! $hasComma) {
+            $clean = str_replace('.', '', $clean);
+        } elseif ($hasComma && ! $hasDot) {
+            $clean = str_replace(',', '.', $clean);
+        }
+
+        return $clean;
+    }
+
     /**
      * GET /api/shipments
      * Lihat semua pengiriman yang melibatkan user yang sedang login
@@ -131,6 +162,9 @@ class ShipmentController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $normalizedCodAmount = $this->normalizeRupiahAmount($request->input('cod_amount'));
+        $request->merge(['cod_amount' => $normalizedCodAmount]);
+
         $request->validate([
             'request_id'      => ['required', 'integer'],
             'courier'         => ['required', 'string', 'max:50'],
@@ -387,7 +421,7 @@ class ShipmentController extends Controller
             'status'  => 'success',
             'message' => 'Terima kasih! Feedback kamu berhasil disimpan.',
             'data'    => [
-                'shipment' => new ShipmentResource($shipment->load('request')),
+                'shipment' => new ShipmentResource($shipment->load('request.item')),
             ]
         ], 200);
     }
@@ -457,7 +491,7 @@ class ShipmentController extends Controller
             'status'  => 'success',
             'message' => 'Feedback berhasil diperbarui.',
             'data'    => [
-                'shipment' => new ShipmentResource($shipment->load('request')),
+                'shipment' => new ShipmentResource($shipment->load('request.item')),
             ]
         ], 200);
     }

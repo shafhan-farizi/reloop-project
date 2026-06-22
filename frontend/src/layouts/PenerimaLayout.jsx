@@ -8,18 +8,16 @@ export default function PenerimaLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-100 flex pt-16 md:pt-20">
+    <div className="min-h-screen bg-slate-100 flex pt-20 md:pt-22 lg:pt-24">
       <SidebarPenerima 
         open={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
       />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-72">
-        <div className="sticky top-0 z-20 bg-slate-100 p-4 md:p-6 pt-6">
-          <Topbar onMenuClick={() => setSidebarOpen(true)} />
-        </div>
+      <main className="flex-1 px-5 md:px-8 py-6 md:py-8 lg:px-8 lg:ml-60">
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <div className="mt-6">
+        <div className="mt-8 md:mt-10">
           <Outlet />
         </div>
       </main>

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   getCategories,
   createCategory,
@@ -8,6 +9,7 @@ import {
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 export default function Categories() {
+  const [searchParams] = useSearchParams();
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -34,6 +36,17 @@ export default function Categories() {
 
     fetchInitial();
   }, []);
+
+  const filteredCategories = useMemo(() => {
+    const q = searchParams.get("search")?.trim().toLowerCase() || "";
+    if (!q) return categories;
+
+    return categories.filter((category) => {
+      const name = category.name?.toLowerCase() || "";
+      const description = category.description?.toLowerCase() || "";
+      return name.includes(q) || description.includes(q);
+    });
+  }, [categories, searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,13 +123,13 @@ export default function Categories() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-col sm:flex-row">
         <div>
-          <h1 className="text-4xl font-bold text-orange-400">Kategori</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-400">Kategori</h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-sm sm:text-base text-gray-500 mt-1">
             Daftar kategori yang tersedia untuk donasi
           </p>
         </div>
@@ -126,49 +139,49 @@ export default function Categories() {
             resetForm();
             setShowForm(true);
           }}
-          className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-medium transition"
+          className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded-lg font-medium transition text-sm sm:text-base whitespace-nowrap"
         >
           + Add Kategori
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b">
-          <h2 className="font-semibold text-lg text-gray-700">Data Kategori</h2>
+      <div className="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b">
+          <h2 className="font-semibold text-base sm:text-lg text-gray-700">Data Kategori</h2>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-100 text-gray-600 text-sm">
+            <thead className="bg-gray-100 text-gray-600 text-xs sm:text-sm">
               <tr>
-                <th className="px-6 py-3 text-left">Nama Kategori</th>
+                <th className="px-4 sm:px-6 py-3 text-left">Nama Kategori</th>
 
-                <th className="px-6 py-3 text-left">Deskripsi Kategori</th>
+                <th className="px-4 sm:px-6 py-3 text-left">Deskripsi Kategori</th>
 
-                <th className="px-6 py-3 text-center">Jumlah Barang</th>
+                <th className="px-4 sm:px-6 py-3 text-center">Jumlah Barang</th>
 
-                <th className="px-6 py-3 text-center">Aksi</th>
+                <th className="px-4 sm:px-6 py-3 text-center">Aksi</th>
               </tr>
             </thead>
 
             <tbody>
-              {categories.length > 0 ? (
-                categories.map((category) => (
+              {filteredCategories.length > 0 ? (
+                filteredCategories.map((category) => (
                   <tr key={category.id} className="border-b hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-800">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 font-medium text-gray-800">
                       {category.name}
                     </td>
 
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-gray-500 text-sm">
                       {category.description || "-"}
                     </td>
 
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-center">
                       {category.items_count ?? 0}
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <div className="flex justify-center gap-2">
                         <button
                           onClick={() => handleEdit(category)}
@@ -191,13 +204,42 @@ export default function Categories() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center py-6 text-gray-500">
+                  <td colSpan="4" className="text-center py-6 text-gray-500 text-sm">
                     Belum ada kategori.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile cards */}
+        <div className="block sm:hidden p-3 space-y-3">
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map((category) => (
+              <div key={category.id} className="bg-white rounded-lg border p-3 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-800 truncate">{category.name}</div>
+                    <div className="text-xs text-gray-500 mt-1 line-clamp-2">{category.description || '-'}</div>
+                  </div>
+                  <div className="text-center shrink-0">
+                    <div className="text-sm font-medium">{category.items_count ?? 0}</div>
+                    <div className="mt-2 flex gap-1">
+                      <button onClick={() => handleEdit(category)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-200 text-emerald-600 hover:bg-emerald-100">
+                        <FiEdit2 size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(category.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-200 text-red-600 hover:bg-red-100">
+                        <FiTrash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-6 text-gray-500 text-sm">Belum ada kategori.</div>
+          )}
         </div>
       </div>
 

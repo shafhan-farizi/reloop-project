@@ -34,7 +34,7 @@ export default function SidebarPengguna({ open, onClose }) {
         onClick={onClose}
       />
 
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 lg:w-72 transform bg-teal-700 px-6 py-8 shadow-2xl transition duration-300 lg:fixed lg:translate-x-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-40 w-56 lg:w-60 transform flex flex-col bg-teal-700 px-4 py-6 shadow-2xl transition duration-300 lg:fixed lg:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="mb-8 flex items-center justify-between lg:hidden">
@@ -55,7 +55,7 @@ export default function SidebarPengguna({ open, onClose }) {
           <p className="text-sm text-teal-100">Kelola donasi dan pengiriman dengan mudah.</p>
         </div>
 
-        <nav className="space-y-3">
+        <nav className="flex-1 space-y-3">
           {mainNav.map((item) => {
             const Icon = item.icon;
             return (
@@ -78,7 +78,7 @@ export default function SidebarPengguna({ open, onClose }) {
           })}
         </nav>
 
-        <div className="mt-10 border-t border-teal-500 pt-6">
+        <div className="mt-auto border-t border-teal-500 pt-6">
           <nav className="space-y-2">
             {secondaryNav.map((item) => {
               const Icon = item.icon;

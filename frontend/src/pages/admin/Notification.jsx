@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
-  FiSearch,
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
@@ -23,8 +23,8 @@ const mapStatusLabel = (isRead) => {
 };
 
 export default function Notification() {
+  const [searchParams] = useSearchParams();
   const [notifications, setNotifications] = useState([]);
-  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -52,7 +52,6 @@ export default function Notification() {
         per_page: meta.per_page,
       };
 
-      if (search.trim()) params.keyword = search.trim();
       if (statusFilter === "read") params.is_read = 1;
       if (statusFilter === "unread") params.is_read = 0;
 
@@ -76,15 +75,9 @@ export default function Notification() {
     const timer = window.setTimeout(() => loadNotifications(), 0);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleSearch = () => {
-    loadNotifications(1);
-  };
+  }, [statusFilter]);
 
   const handleReset = () => {
-    setSearch("");
-    setStatusFilter("");
     setSendError(null);
     setSendSuccess("");
     loadNotifications(1);
@@ -140,56 +133,26 @@ export default function Notification() {
     return user.name || user.email || `User #${user.id}`;
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="rounded-3xl bg-[#f8fafc] p-6 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Notifikasi</h1>
-            <p className="mt-2 text-slate-500">
-              Kelola notifikasi user dan cek status terkirim dalam satu halaman.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative">
-              <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Search"
-                className="w-full rounded-full border border-[#d1fae5] bg-[#f0fdf4] py-3 pl-11 pr-4 text-sm text-[#0f172a] shadow-sm focus:border-[#14B8A6] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/20 md:w-80"
-              />
-            </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-full border border-slate-200 bg-white py-3 px-4 text-sm text-slate-700 shadow-sm focus:border-[#14B8A6] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/20"
-            >
-              {STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleReset}
-              className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-[#0f172a] shadow-sm hover:bg-[#ecfdf5]"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-      </div>
+  const filteredNotifications = useMemo(() => {
+    const query = searchParams.get("search")?.trim().toLowerCase() || "";
+    if (!query) return notifications;
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm">
+    return notifications.filter((item) => {
+      const title = item.title?.toLowerCase() || "";
+      const message = item.message?.toLowerCase() || "";
+      return title.includes(query) || message.includes(query);
+    });
+  }, [notifications, searchParams]);
+
+  return (
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="rounded-xl sm:rounded-3xl bg-white p-4 sm:p-6 shadow-sm">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">
               Tambah Notifikasi
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
               Kirim notifikasi manual ke user tertentu atau broadcast ke semua
               user.
             </p>
@@ -197,7 +160,7 @@ export default function Notification() {
           <button
             onClick={handleSend}
             disabled={sending}
-            className="inline-flex items-center gap-2 rounded-full bg-[#FB923C] px-4 py-3 text-sm font-semibold text-white hover:bg-[#ea7d1f] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full bg-[#FB923C] px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-[#ea7d1f] disabled:opacity-50 whitespace-nowrap"
           >
             {sending ? "Mengirim..." : "Kirim Notifikasi"}
           </button>
@@ -276,22 +239,35 @@ export default function Notification() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl sm:rounded-3xl bg-white p-4 sm:p-6 shadow-sm">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">
+            <h2 className="text-xl sm:text-2xl font-semibold text-slate-900">
               Daftar Notifikasi
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-xs sm:text-sm text-slate-500">
               Total {meta.total} notifikasi.
             </p>
           </div>
-          <button
-            onClick={() => loadNotifications(meta.current_page)}
-            className="inline-flex items-center gap-2 rounded-full bg-[#14B8A6] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0f766e]"
-          >
-            Refresh
-          </button>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="min-w-[160px] rounded-full border border-slate-200 bg-white py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-slate-700 shadow-sm focus:border-[#14B8A6] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/20"
+            >
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => loadNotifications(meta.current_page)}
+              className="inline-flex flex-shrink-0 items-center gap-1 sm:gap-2 rounded-full bg-[#14B8A6] px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-[#0f766e] whitespace-nowrap"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
 
         {error ? (
@@ -300,16 +276,16 @@ export default function Notification() {
           </div>
         ) : null}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200 text-left text-xs sm:text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
-                <th className="px-4 py-4 font-semibold">ID</th>
-                <th className="px-4 py-4 font-semibold">Judul notifikasi</th>
-                <th className="px-4 py-4 font-semibold">Tujuan</th>
-                <th className="px-4 py-4 font-semibold">Jenis</th>
-                <th className="px-4 py-4 font-semibold">Status</th>
-                <th className="px-4 py-4 font-semibold">Tanggal Kirim</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">ID</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">Judul notifikasi</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">Tujuan</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">Jenis</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">Status</th>
+                <th className="px-4 sm:px-6 py-3 sm:py-4 font-semibold">Tanggal Kirim</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#d1fae5]">
@@ -317,45 +293,45 @@ export default function Notification() {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-4 py-8 text-center text-slate-500"
+                    className="px-4 sm:px-6 py-4 text-center text-slate-500 text-xs sm:text-sm"
                   >
                     Memuat notifikasi...
                   </td>
                 </tr>
-              ) : notifications.length === 0 ? (
+              ) : filteredNotifications.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-4 py-8 text-center text-slate-500"
+                    className="px-4 sm:px-6 py-4 text-center text-slate-500 text-xs sm:text-sm"
                   >
                     Tidak ada notifikasi.
                   </td>
                 </tr>
               ) : (
-                notifications.map((notification) => {
+                filteredNotifications.map((notification) => {
                   const status = mapStatusLabel(notification.is_read);
                   return (
                     <tr key={notification.id} className="hover:bg-[#ecfdf5]">
-                      <td className="px-4 py-4 text-[#0f172a]">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4 text-[#0f172a]">
                         {notification.id}
                       </td>
-                      <td className="px-4 py-4 text-[#0f172a]">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4 text-[#0f172a] truncate">
                         {notification.title}
                       </td>
-                      <td className="px-4 py-4 text-[#0f172a]">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4 text-[#0f172a]">
                         {renderRecipient(notification.user)}
                       </td>
-                      <td className="px-4 py-4 text-[#0f172a]">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4 text-[#0f172a]">
                         {notification.type || "In-App"}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4">
                         <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}
+                          className={`inline-flex rounded-full px-2 sm:px-3 py-1 text-xs font-semibold ${status.className}`}
                         >
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-[#475569]">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4 text-[#475569] text-xs sm:text-sm">
                         {notification.created_at
                           ? new Date(
                               notification.created_at,
@@ -366,7 +342,7 @@ export default function Notification() {
                             })
                           : "-"}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 sm:px-6 py-3 sm:py-4">
                         <div className="flex items-center gap-2">
                         </div>
                       </td>
@@ -376,26 +352,56 @@ export default function Notification() {
               )}
             </tbody>
           </table>
-        </div>
+          </div>
+
+          {/* Mobile list */}
+          <div className="block sm:hidden p-3 space-y-3">
+            {loading ? (
+              <div className="text-center py-6 text-slate-500 text-sm">Memuat notifikasi...</div>
+            ) : filteredNotifications.length === 0 ? (
+              <div className="text-center py-6 text-slate-500 text-sm">Tidak ada notifikasi.</div>
+            ) : (
+              filteredNotifications.map((notification) => {
+                const status = mapStatusLabel(notification.is_read);
+                return (
+                  <div key={notification.id} className="bg-white border rounded-lg p-3 shadow-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-slate-900 truncate text-sm">{notification.title}</div>
+                        <div className="text-xs text-slate-500 mt-1 line-clamp-2">{notification.message}</div>
+                        <div className="mt-2">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right text-xs text-slate-500 shrink-0 whitespace-nowrap">
+                        <div>{notification.created_at ? new Date(notification.created_at).toLocaleDateString('id-ID', {day: '2-digit', month: 'short'}) : '-'}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-500">
+          <p className="text-xs sm:text-sm text-slate-500">
             Halaman {meta.current_page} dari {meta.last_page}
           </p>
           <div className="flex items-center gap-2">
             <button
               disabled={meta.current_page <= 1 || loading}
               onClick={() => loadNotifications(meta.current_page - 1)}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1 sm:gap-2 rounded-full border border-slate-200 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
             >
-              <FiChevronLeft /> Previous
+              <FiChevronLeft size={16} /> Previous
             </button>
             <button
               disabled={meta.current_page >= meta.last_page || loading}
               onClick={() => loadNotifications(meta.current_page + 1)}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center gap-1 sm:gap-2 rounded-full border border-slate-200 bg-white px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
             >
-              Next <FiChevronRight />
+              Next <FiChevronRight size={16} />
             </button>
           </div>
         </div>

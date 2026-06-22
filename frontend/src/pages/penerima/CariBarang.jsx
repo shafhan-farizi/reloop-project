@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../../api/xios";
 
 export default function CariBarang() {
+  const [searchParams] = useSearchParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(searchParams.get("search") || "");
   
   // State untuk Form Request
   const [selectedItem, setSelectedItem] = useState(null);
@@ -16,10 +18,10 @@ export default function CariBarang() {
   });
   const [requesting, setRequesting] = useState(false);
 
-  const load = async () => {
+  const load = async (search = "") => {
     setLoading(true);
     try {
-      const res = await api.get('/items', { params: { search: q } });
+      const res = await api.get('/items', { params: { search } });
       const data = res.data?.data?.items || [];
       setItems(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -29,7 +31,11 @@ export default function CariBarang() {
     }
   };
 
-  useEffect(() => { load(); }, [q]);
+  useEffect(() => {
+    const query = searchParams.get("search") || "";
+    setQ(query);
+    load(query);
+  }, [searchParams]);
 
   const handleRequestSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +87,7 @@ export default function CariBarang() {
       {/* Detailed Item + Request Modal */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-4xl shadow-xl">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-3xl sm:max-w-4xl shadow-xl max-h-[90vh] overflow-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-1">
                 <div className="h-56 rounded-lg overflow-hidden bg-slate-100">
@@ -127,9 +133,9 @@ export default function CariBarang() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2">
-                    <button type="button" onClick={() => setSelectedItem(null)} className="flex-1 py-2 border rounded-lg">Batal</button>
-                    <button type="submit" disabled={requesting} className="flex-1 py-2 bg-teal-600 text-white rounded-lg">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                    <button type="button" onClick={() => setSelectedItem(null)} className="w-full sm:flex-1 py-2 border rounded-lg">Batal</button>
+                    <button type="submit" disabled={requesting} className="w-full sm:flex-1 py-2 bg-teal-600 text-white rounded-lg">
                       {requesting ? "Mengirim..." : "Kirim Request"}
                     </button>
                   </div>
