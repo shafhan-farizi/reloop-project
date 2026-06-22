@@ -38,7 +38,7 @@ export default function Topbar({ onMenuClick }) {
     return pathname;
   };
 
-  const isSearchHidden = ["/pengaturan", "/profile", "/admin/tracking"].some((path) => location.pathname.endsWith(path)) || location.pathname === "/admin";
+  const isSearchHidden = ["/pengaturan", "/profile", "/admin/tracking"].some((path) => location.pathname.endsWith(path)) || location.pathname === "/admin" || location.pathname.includes("/admin/tracking/");
 
   const isBackButtonHidden = location.pathname.startsWith("/admin");
 
