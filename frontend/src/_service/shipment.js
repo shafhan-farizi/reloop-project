@@ -12,8 +12,6 @@ export const createShipment = async (data) => {
 };
 
 
-
-
 export const getShipment = async (id) => {
   const response = await api.get(`/shipments/${id}`);
   return response.data.data.shipment; // langsung, karena struktur sudah jelas
