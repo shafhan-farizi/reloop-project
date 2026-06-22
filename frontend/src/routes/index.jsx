@@ -50,6 +50,7 @@ import RiwayatPenerima from "../pages/penerima/RiwayatPenerima";
 import NotificationPenerima from "../pages/penerima/Notification";
 import ProfilePenerima from "../pages/penerima/Profile";
 import PengaturanPenerima from "../pages/penerima/Pengaturan";
+import AdminTrackingDetail from "../pages/admin/AdminTrackingDetail";
 
 export default function AppRoutes() {
   return (
@@ -73,17 +74,12 @@ export default function AppRoutes() {
       {/* ADMIN */}
       <Route path="/admin" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
-
         <Route path="users" element={<Users />} />
-
         <Route path="categories" element={<Categories />} />
-
         <Route path="management" element={<Management />} />
-
         <Route path="tracking" element={<TrackingStatus />} />
-
+        <Route path="tracking/:id" element={<AdminTrackingDetail />} />
         <Route path="riwayat" element={<DonationHistory />} />
-
         <Route path="notifications" element={<Notification />} />
       </Route>
 
