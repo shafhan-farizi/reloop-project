@@ -30,17 +30,6 @@ export default function TambahDonasiDetail() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[2rem] bg-white p-8 shadow-sm">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-        >
-          <ArrowLeftIcon className="h-4 w-4" />
-          Kembali
-        </button>
-      </section>
-
       <section className="rounded-[2rem] bg-white p-8 shadow-[0_32px_80px_rgba(15,23,42,0.08)]">
         {loading ? (
           <div className="py-20 text-center text-slate-500">Memuat detail barang...</div>
@@ -115,13 +104,6 @@ export default function TambahDonasiDetail() {
               <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-xl font-semibold text-slate-900">Aksi</h2>
                 <div className="mt-6 flex flex-col gap-3">
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/pengguna/tambah-donasi/${item.id}/edit`)}
-                    className="inline-flex items-center justify-center rounded-full bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700"
-                  >
-                    Edit Barang
-                  </button>
                   <button
                     type="button"
                     onClick={() => navigate("/pengguna/tambah-donasi")}

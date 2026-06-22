@@ -228,6 +228,7 @@ class DashboardController extends Controller
         $request->validate([
             'user_id'  => ['nullable', 'integer'],
             'type'     => ['nullable', 'string'],
+            'search'   => ['nullable', 'string', 'max:100'],
             'is_read'  => ['nullable', 'in:0,1,true,false'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
@@ -235,6 +236,17 @@ class DashboardController extends Controller
         $notifications = Notification::with('user:id,name,email,username')
             ->when($request->user_id, fn($q, $v) => $q->where('user_id', $v))
             ->when($request->type,    fn($q, $v) => $q->where('type', $v))
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('title', 'like', "%{$search}%")
+                        ->orWhere('message', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('username', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->when(
                 $request->filled('is_read'),
                 fn($q) => $q->where('is_read', $request->boolean('is_read'))

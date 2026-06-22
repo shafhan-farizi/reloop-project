@@ -1,19 +1,22 @@
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 
 export default function DashboardLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-slate-100 flex pt-16 md:pt-20">
+    <div className="min-h-screen bg-slate-100 flex pt-20 md:pt-22 lg:pt-24">
 
-      <Sidebar />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 p-4 md:p-6 lg:ml-72">
+      <main className="flex-1 px-5 md:px-8 py-6 md:py-8 lg:px-8 lg:ml-60">
 
-        <Topbar  />
+        <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <div className="mt-6">
+        <div className="mt-8 md:mt-10">
           <Outlet />
         </div>
 

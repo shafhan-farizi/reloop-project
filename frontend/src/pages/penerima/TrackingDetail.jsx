@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/xios";
+import { submitShipmentFeedback, updateShipmentFeedback } from "../../_service/shipment";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -10,6 +11,12 @@ export default function TrackingDetail() {
   const [shipment, setShipment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackImages, setFeedbackImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [editFeedbackMode, setEditFeedbackMode] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -24,6 +31,33 @@ export default function TrackingDetail() {
   };
 
   useEffect(() => { load(); }, [id]);
+
+  useEffect(() => {
+    if (!shipment) {
+      setRating(0);
+      setFeedbackMessage("");
+      setFeedbackImages([]);
+      setPreviewImages([]);
+      setEditFeedbackMode(false);
+      return;
+    }
+
+    if (shipment.rating !== null && shipment.rating !== undefined) {
+      setRating(shipment.rating);
+      setFeedbackMessage(shipment.feedback_message || "");
+      setEditFeedbackMode(false);
+    } else {
+      setRating(0);
+      setFeedbackMessage("");
+      setEditFeedbackMode(false);
+    }
+  }, [shipment]);
+
+  useEffect(() => {
+    return () => {
+      previewImages.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewImages]);
 
   const buildEvents = (s) => {
     if (!s) return [];
@@ -55,6 +89,43 @@ export default function TrackingDetail() {
       navigate('/penerima/riwayat');
     } catch (err) { console.error(err); }
     finally { setActionLoading(false); }
+  };
+
+  const handleFeedbackImages = (event) => {
+    const files = Array.from(event.target.files || []);
+    setFeedbackImages(files);
+    setPreviewImages(files.map((file) => URL.createObjectURL(file)));
+  };
+
+  const submitFeedback = async () => {
+    if (!shipment) return;
+    if (!rating || rating < 1 || rating > 5) {
+      alert('Pilih rating antara 1 sampai 5 bintang.');
+      return;
+    }
+
+    setFeedbackLoading(true);
+    try {
+      const payload = {
+        rating,
+        feedback_message: feedbackMessage,
+        feedback_images: feedbackImages,
+      };
+
+      const updated = shipment.rating ?
+        await updateShipmentFeedback(shipment.id, payload) :
+        await submitShipmentFeedback(shipment.id, payload);
+
+      setShipment(updated);
+      alert('Feedback berhasil dikirim. Terima kasih!');
+      setFeedbackImages([]);
+      setPreviewImages([]);
+    } catch (err) {
+      console.error(err);
+      alert(err?.response?.data?.message || 'Gagal mengirim feedback.');
+    } finally {
+      setFeedbackLoading(false);
+    }
   };
 
   if (loading) return <div className="p-6">Memuat...</div>;
@@ -144,6 +215,101 @@ export default function TrackingDetail() {
           </div>
         </div>
       </div>
+
+      {currentStatus === 'delivered' && (
+        <div className="rounded-2xl bg-white p-6 border">
+          <h3 className="text-xl font-semibold">Feedback Penerima</h3>
+          {shipment.rating && !editFeedbackMode ? (
+            <div className="mt-4 space-y-4">
+              <div className="flex items-center gap-1 text-amber-400">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <span key={index}>{index < shipment.rating ? '★' : '☆'}</span>
+                ))}
+              </div>
+              <p className="text-sm text-slate-700">{shipment.feedback_message || 'Penerima belum menambahkan pesan.'}</p>
+              {Array.isArray(shipment.feedback_images) && shipment.feedback_images.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                  {shipment.feedback_images.map((image, idx) => (
+                    <img key={idx} src={image} alt={`feedback-${idx}`} className="h-28 w-full rounded-2xl object-cover" />
+                  ))}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => setEditFeedbackMode(true)}
+                className="rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              >
+                Sunting Feedback
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-4">
+              <p className="text-sm text-slate-500">Berikan feedback ke donatur setelah barang sampai.</p>
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Rating</label>
+                <div className="mt-2 flex gap-2 text-2xl text-amber-400">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setRating(index + 1)}
+                      className="rounded-full p-1 transition hover:text-amber-500"
+                    >
+                      {index < rating ? '★' : '☆'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Pesan Feedback</label>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  rows={4}
+                  placeholder="Tinggalkan komentar singkat untuk donatur..."
+                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-slate-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Foto Bukti (opsional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFeedbackImages}
+                  className="mt-2 w-full text-sm text-slate-700"
+                />
+                {previewImages.length > 0 && (
+                  <div className="mt-3 grid grid-cols-3 gap-3">
+                    {previewImages.map((src, idx) => (
+                      <img key={idx} src={src} alt={`preview-${idx}`} className="h-24 w-full rounded-2xl object-cover" />
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={submitFeedback}
+                  disabled={feedbackLoading || rating === 0}
+                  className="rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {feedbackLoading ? 'Mengirim...' : 'Simpan Feedback'}
+                </button>
+                {shipment.rating && (
+                  <button
+                    type="button"
+                    onClick={() => setEditFeedbackMode(false)}
+                    className="rounded-2xl border border-slate-300 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                  >
+                    Batal
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

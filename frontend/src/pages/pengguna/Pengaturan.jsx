@@ -10,11 +10,6 @@ export default function Pengaturan() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [notifications, setNotifications] = useState({
-    email: true,
-    sms: false,
-    app: true,
-  });
   const [theme, setTheme] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") || "light";
@@ -48,10 +43,6 @@ export default function Pengaturan() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const toggleNotification = (name) => {
-    setNotifications((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
   const toggleTheme = () => {
@@ -124,31 +115,6 @@ export default function Pengaturan() {
             </form>
           </section>
 
-          <section className="rounded-3xl bg-white p-6 shadow-sm">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-semibold text-slate-900">Preferensi Notifikasi</h2>
-              <p className="text-sm text-slate-500">Pilih notifikasi apa saja yang ingin Anda terima.</p>
-            </div>
-
-            <div className="mt-6 space-y-4">
-              {Object.entries(notifications).map(([key, value]) => (
-                <button
-                  type="button"
-                  key={key}
-                  onClick={() => toggleNotification(key)}
-                  className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-left hover:bg-slate-100"
-                >
-                  <div>
-                    <h3 className="font-semibold text-slate-900 capitalize">{key === "app" ? "Aplikasi" : key === "email" ? "Email" : "SMS"}</h3>
-                    <p className="text-sm text-slate-500">{key === "app" ? "Notifikasi di aplikasi." : key === "email" ? "Notifikasi via email." : "Notifikasi via SMS."}</p>
-                  </div>
-                  <span className={`inline-flex h-8 w-16 items-center justify-center rounded-full text-sm font-semibold ${value ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-600"}`}>
-                    {value ? "ON" : "OFF"}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
         </div>
 
         <div className="space-y-6">
@@ -190,7 +156,6 @@ export default function Pengaturan() {
 
             <ul className="mt-6 space-y-3 text-sm text-slate-600">
               <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Ubah password dan keamanan akun.</li>
-              <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Kelola preferensi notifikasi.</li>
               <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Atur tampilan aplikasi.</li>
               <li className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Nantinya bisa ditambah fitur hapus akun atau ubah bahasa.</li>
             </ul>

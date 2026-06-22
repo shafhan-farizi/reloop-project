@@ -20,6 +20,7 @@ class Shipment extends Model
     {
         return [
             'feedback_images' => 'array',
+            'cod_amount' => 'float',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
         ];

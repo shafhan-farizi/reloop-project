@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import {
   getUserNotifications,
@@ -19,6 +20,7 @@ const mapStatusLabel = (isRead) => {
 };
 
 export default function NotificationPenerima() {
+  const [searchParams] = useSearchParams();
   const [notifications, setNotifications] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,16 @@ export default function NotificationPenerima() {
     total: 0,
     unread_count: 0,
   });
+
+  const searchQuery = searchParams.get("search")?.trim().toLowerCase() || "";
+
+  const filteredNotifications = useMemo(() => {
+    if (!searchQuery) return notifications;
+    return notifications.filter((notif) =>
+      (notif.title || "").toLowerCase().includes(searchQuery) ||
+      (notif.message || "").toLowerCase().includes(searchQuery)
+    );
+  }, [notifications, searchQuery]);
 
   const loadNotifications = async (page = 1) => {
     setLoading(true);
@@ -108,6 +120,13 @@ export default function NotificationPenerima() {
               ))}
             </select>
             <button
+              onClick={() => loadNotifications(1)}
+              disabled={loading}
+              className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50 disabled:opacity-50"
+            >
+              Refresh
+            </button>
+            <button
               onClick={handleMarkAllRead}
               disabled={!notifications.length || loading}
               className="rounded-2xl bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
@@ -138,73 +157,111 @@ export default function NotificationPenerima() {
           </div>
         ) : null}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>
-                <th className="px-4 py-4 font-semibold">Judul</th>
-                <th className="px-4 py-4 font-semibold">Pesan</th>
-                <th className="px-4 py-4 font-semibold">Status</th>
-                <th className="px-4 py-4 font-semibold">Tanggal</th>
-                <th className="px-4 py-4 font-semibold">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#d1fae5]">
-              {loading ? (
+        <div>
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+              <thead className="bg-slate-50 text-slate-600">
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                    Memuat notifikasi...
-                  </td>
+                  <th className="px-4 py-4 font-semibold">Judul</th>
+                  <th className="px-4 py-4 font-semibold">Pesan</th>
+                  <th className="px-4 py-4 font-semibold">Status</th>
+                  <th className="px-4 py-4 font-semibold">Tanggal</th>
+                  <th className="px-4 py-4 font-semibold">Aksi</th>
                 </tr>
-              ) : notifications.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                    Tidak ada notifikasi.
-                  </td>
-                </tr>
-              ) : (
-                notifications.map((notification) => {
+              </thead>
+              <tbody className="divide-y divide-[#d1fae5]">
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                      Memuat notifikasi...
+                    </td>
+                  </tr>
+                ) : filteredNotifications.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                      Tidak ada notifikasi yang cocok.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredNotifications.map((notification) => {
+                    const status = mapStatusLabel(notification.is_read);
+                    return (
+                      <tr key={notification.id} className="hover:bg-[#ecfdf5]">
+                        <td className="px-4 py-4 text-[#0f172a] font-semibold">
+                          {notification.title}
+                        </td>
+                        <td className="px-4 py-4 text-[#475569]">
+                          {notification.message || "-"}
+                        </td>
+                        <td className="px-4 py-4">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}
+                          >
+                            {status.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-[#475569]">
+                          {notification.created_at
+                            ? new Date(notification.created_at).toLocaleDateString("id-ID", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })
+                            : "-"}
+                        </td>
+                        <td className="px-4 py-4">
+                          <button
+                            type="button"
+                            disabled={notification.is_read}
+                            onClick={() => handleMarkRead(notification.id)}
+                            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {notification.is_read ? "Sudah Dibaca" : "Tandai Dibaca"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="block sm:hidden">
+            {loading ? (
+              <div className="p-4 text-center text-sm text-slate-500">Memuat notifikasi...</div>
+            ) : filteredNotifications.length === 0 ? (
+              <div className="p-4 text-center text-sm text-slate-500">Tidak ada notifikasi yang cocok.</div>
+            ) : (
+              <div className="space-y-3">
+                {filteredNotifications.map((notification) => {
                   const status = mapStatusLabel(notification.is_read);
                   return (
-                    <tr key={notification.id} className="hover:bg-[#ecfdf5]">
-                      <td className="px-4 py-4 text-[#0f172a] font-semibold">
-                        {notification.title}
-                      </td>
-                      <td className="px-4 py-4 text-[#475569]">
-                        {notification.message || "-"}
-                      </td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}
-                        >
-                          {status.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-[#475569]">
-                        {notification.created_at
-                          ? new Date(notification.created_at).toLocaleDateString("id-ID", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : "-"}
-                      </td>
-                      <td className="px-4 py-4">
+                    <div key={notification.id} className="bg-white rounded-lg p-3 shadow-sm">
+                      <div className="flex justify-between">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-slate-900 text-sm truncate">{notification.title}</div>
+                          <div className="text-xs text-slate-500 mt-1 line-clamp-2">{notification.message || '-'}</div>
+                        </div>
+                        <div className="ml-3 text-xs text-slate-400">{notification.created_at ? new Date(notification.created_at).toLocaleDateString('id-ID') : '-'}</div>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span>
                         <button
                           type="button"
                           disabled={notification.is_read}
                           onClick={() => handleMarkRead(notification.id)}
-                          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
                         >
-                          {notification.is_read ? "Sudah Dibaca" : "Tandai Dibaca"}
+                          {notification.is_read ? 'Sudah Dibaca' : 'Tandai Dibaca'}
                         </button>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   );
-                })
-              )}
-            </tbody>
-          </table>
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

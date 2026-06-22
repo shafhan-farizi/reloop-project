@@ -1,9 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../../api/xios";
 
 export default function RiwayatPenerima() {
+  const [searchParams] = useSearchParams();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const searchQuery = searchParams.get("search")?.trim().toLowerCase() || "";
+
+  const filteredHistory = useMemo(() => {
+    if (!searchQuery) return history;
+    return history.filter((h) =>
+      (h.request?.item?.title || "").toLowerCase().includes(searchQuery)
+    );
+  }, [history, searchQuery]);
 
   const load = async () => {
     setLoading(true);
@@ -35,11 +46,11 @@ export default function RiwayatPenerima() {
 
       {loading ? (
         <div className="rounded-[2rem] bg-white p-8 shadow-sm border border-slate-200 text-center text-slate-500">Memuat riwayat...</div>
-      ) : history.length === 0 ? (
-        <div className="rounded-[2rem] bg-white p-8 shadow-sm border border-slate-200 text-center text-slate-500">Belum ada pengiriman yang sudah dikonfirmasi diterima.</div>
+      ) : filteredHistory.length === 0 ? (
+        <div className="rounded-[2rem] bg-white p-8 shadow-sm border border-slate-200 text-center text-slate-500">Tidak ada pengiriman yang cocok.</div>
       ) : (
         <div className="space-y-6">
-          {history.map((h) => (
+          {filteredHistory.map((h) => (
             <div key={h.id} className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-4">

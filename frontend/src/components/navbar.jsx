@@ -13,21 +13,24 @@ export default function Navbar() {
           <Link to="/" className="text-sm font-medium text-slate-700 hover:text-slate-900">
             Beranda
           </Link>
+          <Link to="/catalog" className="text-sm font-medium text-slate-700 hover:text-slate-900">
+            Katalog
+          </Link>
           <a href="/#fitur" className="text-sm font-medium text-slate-700 hover:text-slate-900">
             Tentang
           </a>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             to="/login"
-            className="hidden rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 lg:inline-flex"
+            className="inline-flex rounded-full border border-slate-200 bg-white px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
           >
             Masuk
           </Link>
           <Link
             to="/register"
-            className="inline-flex rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
+            className="inline-flex rounded-full bg-orange-500 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
           >
             Bergabung
           </Link>

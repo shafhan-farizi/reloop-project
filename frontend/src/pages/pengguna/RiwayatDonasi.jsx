@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../../api/xios";
 
 const statusLabel = {
@@ -16,9 +17,19 @@ const statusBadge = {
 };
 
 export default function RiwayatDonasi() {
+  const [searchParams] = useSearchParams();
   const [shipments, setShipments] = useState([]);
   const [selectedShipment, setSelectedShipment] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const searchQuery = searchParams.get("search")?.trim().toLowerCase() || "";
+
+  const filteredShipments = useMemo(() => {
+    if (!searchQuery) return shipments;
+    return shipments.filter((shipment) =>
+      (shipment.request?.item?.title || "").toLowerCase().includes(searchQuery)
+    );
+  }, [shipments, searchQuery]);
 
   const load = async () => {
     setLoading(true);
@@ -70,13 +81,27 @@ export default function RiwayatDonasi() {
     return resolveImageUrl(rawImage) || '/placeholder.png';
   };
 
+  const normalizeRupiahValue = (value) => {
+    if (value === null || value === undefined || value === '') return 0;
+    const normalized = String(value)
+      .replace(/\./g, '')
+      .replace(/,/g, '.')
+      .replace(/[^\d.-]/g, '');
+    return Number(normalized) || 0;
+  };
+
+  const formatRupiahValue = (value) => {
+    return normalizeRupiahValue(value).toLocaleString('id-ID');
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold">Riwayat Donasi</h2>
       <div className="mt-4 grid gap-6 lg:grid-cols-[1.7fr_1fr]">
         <div className="bg-white rounded-3xl p-5 shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div>
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-slate-600">
                   <th className="py-3">Barang</th>
@@ -93,14 +118,14 @@ export default function RiwayatDonasi() {
                       Memuat riwayat pengiriman...
                     </td>
                   </tr>
-                ) : shipments.length === 0 ? (
+                ) : filteredShipments.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="p-10 text-center text-slate-500">
-                      Belum ada riwayat pengiriman.
+                      Tidak ada riwayat pengiriman yang cocok.
                     </td>
                   </tr>
                 ) : (
-                  shipments.map((shipment) => (
+                  filteredShipments.map((shipment) => (
                     <tr key={shipment.id} className="border-t hover:bg-slate-50 transition-colors">
                       <td className="py-3 font-semibold text-slate-900">
                         {shipment.request?.item?.title || "-"}
@@ -133,7 +158,42 @@ export default function RiwayatDonasi() {
                   ))
                 )}
               </tbody>
-            </table>
+              </table>
+            </div>
+
+            <div className="block sm:hidden">
+              {loading ? (
+                <div className="p-6 text-center text-slate-500">Memuat riwayat pengiriman...</div>
+              ) : filteredShipments.length === 0 ? (
+                <div className="p-6 text-center text-slate-500">Tidak ada riwayat pengiriman yang cocok.</div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredShipments.map((shipment) => (
+                    <div key={shipment.id} className="bg-white rounded-lg p-3 shadow-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="h-12 w-12 rounded-md overflow-hidden bg-slate-100 flex-shrink-0">
+                          <img src={getShipmentImage(shipment)} alt={shipment.request?.item?.title || 'Barang'} className="h-full w-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-semibold text-slate-900 text-sm truncate">{shipment.request?.item?.title || '-'}</div>
+                              <div className="text-xs text-slate-500">{shipment.request?.requester?.name || '-'}</div>
+                            </div>
+                            <div className="text-xs text-slate-400">{shipment.created_at ? new Date(shipment.created_at).toLocaleDateString('id-ID') : '-'}</div>
+                          </div>
+
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusBadge[shipment.status] || 'bg-slate-100 text-slate-700'}`}>{statusLabel[shipment.status] || shipment.status || 'Selesai'}</span>
+                            <button onClick={() => setSelectedShipment(shipment)} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100">Lihat Detail</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -142,36 +202,59 @@ export default function RiwayatDonasi() {
             <h3 className="text-lg font-semibold">Detail Donasi</h3>
             {selectedShipment ? (
               <div className="mt-5 space-y-5">
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 rounded-3xl bg-white p-3 shadow-sm">
-                      <img
-                        src={getShipmentImage(selectedShipment)}
-                        alt={selectedShipment.request?.item?.title || 'Barang'}
-                        className="h-full w-full rounded-2xl object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-500">Nama Barang</p>
-                      <p className="text-lg font-semibold text-slate-900">{selectedShipment.request?.item?.title || '-'}</p>
-                      <p className="text-sm text-slate-500">{selectedShipment.request?.item?.category?.name || '-'}</p>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="grid gap-3">
                   <div className="rounded-3xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Penerima</p>
-                    <p className="mt-2 font-semibold text-slate-900">{selectedShipment.request?.requester?.name || '-'}</p>
-                    <p className="text-sm text-slate-500">{selectedShipment.request?.delivery_address || '-'}</p>
-                    <p className="mt-2 text-sm text-slate-500">No. HP: {selectedShipment.request?.recipient_phone || '-'}</p>
-                  </div>
-                  <div className="rounded-3xl border border-slate-200 p-4">
-                    <p className="text-sm text-slate-500">Pengiriman</p>
-                    <p className="mt-2 text-sm text-slate-900">Kurir: {selectedShipment.courier || '-'}</p>
-                    <p className="text-sm text-slate-900">No. Resi: {selectedShipment.tracking_number || '-'}</p>
-                    <p className="mt-2 text-sm text-slate-500">COD: Rp {selectedShipment.cod_amount?.toLocaleString('id-ID') || '0'}</p>
-                    <p className="mt-2 text-sm text-slate-500">Dibuat: {selectedShipment.created_at ? new Date(selectedShipment.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</p>
+                    <div className="flex items-center gap-4 pb-4 border-b border-slate-200">
+                      <div className="h-16 w-16 rounded-3xl bg-white p-2 shadow-sm flex-shrink-0">
+                        <img
+                          src={getShipmentImage(selectedShipment)}
+                          alt={selectedShipment.request?.item?.title || 'Barang'}
+                          className="h-full w-full rounded-2xl object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-slate-500 uppercase tracking-wide">Nama Barang</p>
+                        <p className="text-lg font-semibold text-slate-900 truncate">{selectedShipment.request?.item?.title || '-'}</p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {selectedShipment.request?.item?.category?.name && (
+                            <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700">
+                              {selectedShipment.request.item.category.name}
+                            </span>
+                          )}
+                          {selectedShipment.request?.item?.condition && (
+                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                              {selectedShipment.request.item.condition}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {selectedShipment.request?.item?.description && (
+                      <div className="mt-4 pt-4 border-t border-slate-200">
+                        <p className="text-sm text-slate-600">{selectedShipment.request.item.description}</p>
+                      </div>
+                    )}
+
+                    <div className="mt-4 pt-4 border-t border-slate-200 grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase tracking-wide">Penerima</p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">{selectedShipment.request?.requester?.name || '-'}</p>
+                        <p className="text-xs text-slate-500 mt-1">{selectedShipment.request?.delivery_address || '-'}</p>
+                        <p className="text-xs text-slate-500">HP: {selectedShipment.request?.recipient_phone || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase tracking-wide">Pengiriman</p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">{selectedShipment.courier || '-'}</p>
+                        <p className="text-xs text-slate-500 mt-1">Resi: {selectedShipment.tracking_number || '-'}</p>
+                        <p className="text-xs text-slate-500">COD: Rp {formatRupiahValue(selectedShipment.cod_amount)}</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t border-slate-200">
+                      <p className="text-xs text-slate-500 uppercase tracking-wide">Dibuat</p>
+                      <p className="mt-1 text-sm text-slate-900">{selectedShipment.created_at ? new Date(selectedShipment.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</p>
+                    </div>
                   </div>
                 </div>
 

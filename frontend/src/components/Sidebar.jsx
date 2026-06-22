@@ -22,9 +22,8 @@ export default function Sidebar({ open, onClose }) {
     { label: "Dashboard", icon: <FiHome />, to: "/admin" },
     { label: "Users", icon: <FiUser />, to: "/admin/users" },
     { label: "Categories", icon: <FiGrid/> , to: "/admin/categories" },
-    { label: "Input Pengiriman", icon: <FiTruck/> , to: "/admin/input-resi" },
     { label: "Tracking", icon: <FiMap/>, to: "/admin/tracking" },
-    {label: "Riwayat", icon: <FiClock/>, to: "/admin/riwayat" },
+    { label: "Riwayat", icon: <FiClock/>, to: "/admin/riwayat" },
     { label: "Management", icon: <FiSettings/>, to: "/admin/management" },
     { label: "Notifications", icon: <FiBell />, to: "/admin/notifications" },
     { label: "Keluar", icon: <FiLogOut />, to: "/logout" },
@@ -75,8 +74,8 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 lg:w-72 flex flex-col
-        ${bgColor} px-5 py-6 shadow-2xl transition duration-300
+        className={`fixed inset-y-0 left-0 z-40 w-56 lg:w-60 flex flex-col
+        bg-teal-700 px-4 py-6 shadow-2xl transition duration-300
         lg:fixed lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -101,7 +100,7 @@ export default function Sidebar({ open, onClose }) {
         </div>
 
         {/* Menu */}
-        <nav className="space-y-2 flex-1">
+        <nav className="flex-1 space-y-3">
           {navItems.map((item) => (
             <NavLink
               key={item.label}
@@ -124,7 +123,7 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         {/* Need Help */}
-        <div className="mt-8 rounded-3xl bg-white/20 p-5 text-sm text-white shadow">
+        <div className="hidden border-t border-teal-500 pt-6">
           <p className="font-semibold">Butuh bantuan?</p>
           <p className="mt-2 text-white/90 leading-relaxed">
             {userRole === "admin" 
@@ -134,7 +133,7 @@ export default function Sidebar({ open, onClose }) {
         </div>
 
         {/* Profile*/}
-        <div className="mt-auto pt-6">
+        <div className="hidden mt-auto pt-6">
           <div className="flex items-center justify-between border-t border-white/30 pt-5">
             {/* Profile */}
             <div className="flex items-center gap-4">
