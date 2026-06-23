@@ -12,7 +12,7 @@ export default function DashboardLayout() {
 
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 px-5 md:px-8 py-6 md:py-8 lg:px-8 lg:ml-60">
+      <main className="flex-1 w-full overflow-x-hidden px-4 sm:px-6 md:px-8 py-6 md:py-8 lg:px-8 lg:ml-60">
 
         <Topbar onMenuClick={() => setSidebarOpen(true)} />
 
